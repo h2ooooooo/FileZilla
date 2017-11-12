@@ -1,0 +1,38 @@
+{
+    "name": "jalsoedesign/FileZilla",
+    "type": "library",
+    "description": "FileZilla library",
+    "homepage": "http://www.jalsoedesign.net",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Andreas Jalsøe",
+            "email": "aj@seriousgames.net",
+            "homepage": "http://www.seriousgames.net",
+            "role": "developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "nicolab/php-ftp-client": "^1.4",
+        "phpseclib/phpseclib": "^2.0"
+    },
+    "require-dev": {
+        "jalsoedesign/climax": "master-dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "jalsoedesign\\FileZilla\\": "src/"
+        }
+    },
+    "dist": {
+        "url": "git@github.com:h2ooooooo/FileZilla.git",
+        "type": "vcs"
+    },
+    "repositories": [
+        {
+            "url": "git@github.com:h2ooooooo/CLImax.git",
+            "type": "git"
+        }
+    ]
+}

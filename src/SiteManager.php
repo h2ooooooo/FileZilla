@@ -96,6 +96,6 @@ class SiteManager {
 			$servers = $servers[ $serverSplitPart ];
 		}
 
-		return $servers;
+		return !empty($servers) ? $servers : null;
 	}
 }

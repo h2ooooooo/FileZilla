@@ -1,6 +1,6 @@
 # jalsoedesign/filezilla
 
-FileZilla `sitemanager.xml` parser used to get details for specific servers and/or connect to them using [thephpleague/flysystem](https://github.com/thephpleague/flysystem).
+FileZilla `sitemanager.xml` parser used to get details for specific servers and/or connect to them using [`thephpleague/flysystem`](https://github.com/thephpleague/flysystem).
 
 ## Examples
 

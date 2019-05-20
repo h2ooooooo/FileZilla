@@ -8,6 +8,13 @@
 
 FileZilla `sitemanager.xml` parser used to get details for specific servers and/or connect to them using [`thephpleague/flysystem`](https://github.com/thephpleague/flysystem).
 
+## Installation
+
+You can install the library using [`composer`](https://getcomposer.org/):
+
+    composer require jalsoedesign/filezilla
+
+After this simply require `./vendor/autoload.php` and you can use the classes.
 ## Examples
 
 ### CLImax example

@@ -1,16 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: aj
- * Date: 07-06-2017
- * Time: 11:01
- */
 
 namespace jalsoedesign\FileZilla;
 
 use jalsoedesign\FileZilla\enum\LogonType;
 use jalsoedesign\FileZilla\enum\CharsetEncoding;
-use jalsoedesign\FileZilla\enum\ServerFormat;
 use jalsoedesign\FileZilla\enum\PassiveMode;
 use jalsoedesign\FileZilla\enum\ServerProtocol;
 use jalsoedesign\FileZilla\enum\ServerType;

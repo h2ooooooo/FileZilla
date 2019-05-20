@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: aj
- * Date: 07-06-2017
- * Time: 12:43
- */
 
 namespace jalsoedesign\FileZilla\enum;
 

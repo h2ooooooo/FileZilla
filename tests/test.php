@@ -4,12 +4,8 @@ namespace jalsoedesign\FileZilla\tests;
 
 use CLImax\ApplicationUtf8;
 use CLImax\Plugins\HighlightPlugin;
-use jalsoedesign\FileZilla\enum\PassiveMode;
 use jalsoedesign\FileZilla\Server;
 use jalsoedesign\FileZilla\SiteManager;
-use League\Flysystem\Adapter\Ftp;
-use League\Flysystem\Filesystem;
-use VladimirYuldashev\Flysystem\CurlFtpAdapter;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 

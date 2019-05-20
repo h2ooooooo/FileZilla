@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: aj
- * Date: 07-06-2017
- * Time: 11:01
- */
 
 namespace jalsoedesign\FileZilla;
 

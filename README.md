@@ -1,5 +1,11 @@
 # jalsoedesign/filezilla
 
+[![Author](https://img.shields.io/badge/author-jalsoedesign-blue.svg?style=flat-square)](https://jalsoedesign.net)
+[![Software License](https://img.shields.io/github/license/h2ooooooo/FileZilla.svg)](LICENSE)
+[![PHP Version](https://img.shields.io/packagist/php-v/jalsoedesign/filezilla.svg?style=flat-square)](https://packagist.org/packages/jalsoedesign/filezilla)
+[![Total Downloads](https://img.shields.io/packagist/dt/jalsoedesign/filezilla.svg?style=flat-square)](https://packagist.org/packages/jalsoedesign/filezilla)
+[![Github Issues](https://img.shields.io/github/issues/h2ooooooo/FileZilla.svg)](https://github.com/jalsoedesign/filezilla/issues)
+
 FileZilla `sitemanager.xml` parser used to get details for specific servers and/or connect to them using [`thephpleague/flysystem`](https://github.com/thephpleague/flysystem).
 
 ## Examples

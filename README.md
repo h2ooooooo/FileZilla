@@ -54,3 +54,16 @@ The problem with this package is that the support for explicit FTPS is faulty, s
 To fix this there's a patch applied automatically by composer located here:
 
 [`patches/CurlFtpAdapter_explicit_ftp.patch`](./patches/CurlFtpAdapter_explicit_ftp.patch)
+
+## Dependencies
+
+The following composer libraries are used as dependencies:
+
+| Library                                                                                                       | Version      | Reason                                                                                                  | 
+|---------------------------------------------------------------------------------------------------------------|--------------|---------------------------------------------------------------------------------------------------------|
+| [`ext-dom`](https://www.php.net/manual/en/book.dom.php)                                                       | `*`          | The [`DOM`](https://www.php.net/manual/en/book.dom.php) extension is required to read `sitemanager.xml` |
+| [`league/flysystem`](https://packagist.org/packages/league/flysystem)                                         | `^1.0`       | Flysystem is used to be able to call `$server->getFilesystem()`                                         |
+| [`league/flysystem-sftp`](https://packagist.org/packages/league/flysystem-sftp)                               | `^1.0`       | SFTP support for Flysystem                                                                              |
+| [`vladimir-yuldashev/flysystem-curlftp`](https://packagist.org/packages/vladimir-yuldashev/flysystem-curlftp) | `^2.0`       | FTPS support for Flysystem                                                                              |
+| [`vaimo/composer-patches`](https://packagist.org/packages/vaimo/composer-patches)                             | `^4.16`      | Ability to add patch to `flysystem-curlftp` to fix explicit FTP issue                                   |
+| [`jalsoedesign/climax`](https://packagist.org/packages/jalsoedesign/climax)                                   | `master-dev` | CLImax support for test application |

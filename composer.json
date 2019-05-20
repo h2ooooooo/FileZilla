@@ -1,5 +1,5 @@
 {
-    "name": "jalsoedesign/FileZilla",
+    "name": "jalsoedesign/filezilla",
     "type": "library",
     "description": "FileZilla library",
     "homepage": "http://www.jalsoedesign.net",
@@ -13,9 +13,12 @@
         }
     ],
     "require": {
+        "ext-dom": "*",
         "php": ">=5.4",
-        "nicolab/php-ftp-client": "^1.4",
-        "phpseclib/phpseclib": "^2.0"
+        "league/flysystem": "^1.0",
+        "league/flysystem-sftp": "^1.0",
+        "vladimir-yuldashev/flysystem-curlftp": "^2.0",
+        "vaimo/composer-patches": "^4.16"
     },
     "require-dev": {
         "jalsoedesign/climax": "master-dev"
@@ -25,14 +28,7 @@
             "jalsoedesign\\FileZilla\\": "src/"
         }
     },
-    "dist": {
-        "url": "git@github.com:h2ooooooo/FileZilla.git",
-        "type": "vcs"
-    },
-    "repositories": [
-        {
-            "url": "git@github.com:h2ooooooo/CLImax.git",
-            "type": "git"
-        }
-    ]
+    "extra": {
+        "patches-search": "patches"
+    }
 }

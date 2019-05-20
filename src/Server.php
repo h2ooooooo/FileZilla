@@ -8,275 +8,452 @@
 
 namespace jalsoedesign\FileZilla;
 
+use jalsoedesign\FileZilla\enum\LogonType;
+use jalsoedesign\FileZilla\enum\CharsetEncoding;
+use jalsoedesign\FileZilla\enum\ServerFormat;
 use jalsoedesign\FileZilla\enum\PassiveMode;
+use jalsoedesign\FileZilla\enum\ServerProtocol;
 use jalsoedesign\FileZilla\enum\ServerType;
+use League\Flysystem\Adapter\Ftp;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Sftp\SftpAdapter;
+use VladimirYuldashev\Flysystem\CurlFtpAdapter;
 
-class Server {
-	protected $host;
-	protected $port;
-	/**
-	 * @var int $protocol
-	 *
-	 *   0 - FTP
-	 *   1 - SFTP
-	 *   2 - FTPS
-	 *   3 - FTPES
-	 *   4 - INSECURE_FTP
-	 */
-	protected $protocol;
-	protected $type;
-	protected $user;
-	protected $password;
-	/**
-	 * @var int $logonType
-	 *
-	 *   0 - anonymous,
-	 *   1 - normal,
-	 *   2 - ask, // ask should not be sent to the engine, it's intended to be used by the interface
-	 *   3 - interactive,
-	 *   4 - account,
-	 *   5 - key,
-	 *   6 - count
-	 * }
-	 */
-	protected $logonType;
-	protected $timezoneOffset;
-	/**
-	 * @var
-	 *
-	 *   MODE_DEFAULT
-	 * MODE_ACTIVE
-	 * MODE_PASSIVE
-	 */
-	protected $passiveMode;
-	protected $maximumMultipleConnections;
-	/**
-	 * @var
-	 *
-	 * ENCODING_AUTO
-	 * ENCODING_UTF8
-	 * ENCODING_CUSTOM
-	 */
-	protected $encodingType;
-	protected $bypassProxy;
-	protected $name;
-	protected $comments;
-	protected $localDirectory;
-	/**
-	 * 1 0 4 home 3 usr 3 www
-	 *
-	 *   1
-	 *     path type (ServerType)
-	 *
-	 *   0
-	 *     prefix length
-	 *
-	 *   4 home
-	 *     4 - length of "home"
-	 *
-	 *   3 usr
-	 *     3 - length of "usr"
-	 *
-	 *   3 www
-	 *     3 - length of "www"
-	 */
-	protected $remoteDirectory;
-	protected $syncronizedBrowsing;
-	protected $directoryComparison;
+/**
+ * Class Server
+ *
+ * @package jalsoedesign\FileZilla
+ */
+class Server
+{
+    /** @var string The server host */
+    protected $host;
 
-	/**
-	 * Server constructor.
-	 *
-	 * @param \SimpleXMLElement $xmlElement
-	 */
-	public function __construct($xmlElement) {
-		$tagMapper = [
-			'Host'                       => 'host',
-			'Port'                       => 'port',
-			'Protocol'                   => 'protocol',
-			'Type'                       => 'type',
-			'User'                       => 'user',
-			'Pass'                       => 'password',
-			'Logontype'                  => 'logonType',
-			'TimezoneOffset'             => 'timezoneOffset',
-			'PasvMode'                   => 'passiveMode',
-			'MaximumMultipleConnections' => 'maximumMultipleConnections',
-			'EncodingType'               => 'encodingType',
-			'BypassProxy'                => 'bypassProxy',
-			'Name'                       => 'name',
-			'Comments'                   => 'comments',
-			'LocalDir'                   => 'localDirectory',
-			'RemoteDir'                  => 'remoteDirectory',
-			'SyncBrowsing'               => 'synchronizedBrowsing',
-			'DirectoryComparison'        => 'directoryComparison',
-		];
+    /** @var int The server port */
+    protected $port;
 
-		$caster = [
-			'port'                       => 'int',
-			'protocol'                   => 'int',
-			'type'                       => 'int',
-			'logonType'                  => 'int',
-			'timezoneOffset'             => 'int',
-			'maximumMultipleConnections' => 'int',
-			'bypassProxy'                => 'bool',
-			'synchronizedBrowsing'       => 'bool',
-			'directoryComparison'        => 'bool',
-		];
+    /**
+     * @var int $protocol The server protocol (ServerProtocol)
+     * @see ServerProtocol
+     */
+    protected $protocol;
 
-		foreach ($xmlElement->children() as $tag) {
-			/** @var \SimpleXMLElement $tag */
-			$tagName = $tag->getName();
+    /**
+     * @var int $type The server type (ServerType)
+     * @see ServerType
+     */
+    protected $type;
 
-			if ( ! isset($tagMapper[ $tagName ])) {
-				continue;
-			}
+    /** @var string The server username */
+    protected $user;
 
-			$property = $tagMapper[ $tagName ];
+    /** @var string The server password */
+    protected $password;
 
-			$value = (string) $tag;
+    /** @var string The path to the server key file */
+    protected $keyFile;
 
-			foreach ($tag->attributes() as $attribute) {
-				/** @var \SimpleXMLElement $attribute */
-				$attributeName  = $attribute->getName();
-				$attributeValue = (string) $attribute;
+    /**
+     * @var int $logonType The server logon type (LogonType)
+     * @see LogonType
+     */
+    protected $logonType;
 
-				if ($attributeName === 'encoding') {
-					if ($attributeValue === 'base64') {
-						$value = base64_decode($value);
-					}
-				}
-			}
+    /** @var int The timezone offset */
+    protected $timezoneOffset;
 
-			if (isset($caster[ $property ])) {
-				settype($value, $caster[ $property ]);
-			}
+    /**
+     * @var int $passiveMode The passive mode for this server (PassiveMode - only relevant for FTP servers)
+     * @see PassiveMode
+     */
+    protected $passiveMode;
 
-			$this->{$property} = $value;
-		}
-	}
+    /** @var int The maximum concurrent connections to the server - 0 means no limit */
+    protected $maximumMultipleConnections;
 
-	/**
-	 * 1 0 4 home 3 usr 3 www
-	 *
-	 *   1
-	 *     path type (ServerType)
-	 *
-	 *   0
-	 *     prefix length
-	 *
-	 *   4 home
-	 *     4 - length of "home"
-	 *
-	 *   3 usr
-	 *     3 - length of "usr"
-	 *
-	 *   3 www
-	 *     3 - length of "www"
-	 */
-	public function getRemoteDirectory() {
-		$remoteDirectory = $this->remoteDirectory;
+    /**
+     * @var int $encodingType The server encoding type (CharsetEncoding)
+     * @see CharsetEncoding
+     */
+    protected $encodingType;
 
-		if (preg_match('~^(\d+)\s+(\d+)\s+(.+)$~', $remoteDirectory, $match)) {
-			$pathType     = (int) $match[1];
-			$prefixLength = (int) $match[2];
+    /** @var bool Whether or not to bypass the proxy */
+    protected $bypassProxy;
 
-			$offset = 0;
+    /** @var string The server name in FileZilla */
+    protected $name;
 
-			$pathSegments = [];
+    /** @var string The server comments */
+    protected $comments;
 
-			while (preg_match('~(\d+)~', $match[3], $pathLengthMatch, PREG_OFFSET_CAPTURE, $offset)) {
-				$pathStringLength = strlen($pathLengthMatch[1][0]);
-				$pathLength       = (int) $pathLengthMatch[1][0];
-				$pathLengthOffset = (int) $pathLengthMatch[1][1];
+    /** @var string The initial local directory */
+    protected $localDirectory;
 
-				$pathSegments[] = substr($match[3], $pathLengthOffset + $pathStringLength + 1, $pathLength);
+    /** @var string The initial remote directory (raw) */
+    protected $remoteDirectory;
 
-				$offset = $pathLengthOffset + $pathStringLength + $pathLength + 1;
-			}
+    /** @var bool Whether or not to use synchronized browsing */
+    protected $synchronizedBrowsing;
 
-			$directorySeparator = '/';
+    /** @var bool Whether or not to use directory comparison */
+    protected $directoryComparison;
 
-			if ($pathType === ServerType::DOS) {
-				$directorySeparator = '\\';
-			}
+    /**
+     * Server constructor.
+     *
+     * @param array $properties The properties (usually from ServerFactory)
+     */
+    public function __construct($properties)
+    {
+        foreach ($properties as $property => $value) {
+            $this->{$property} = $value;
+        }
+    }
 
-			$path = implode($directorySeparator, $pathSegments);
+    /**
+     * Gets the server remote directory
+     *
+     * @param string $default The default return string
+     *
+     * @return string
+     */
+    public function getRemoteDirectory($default = null)
+    {
+        /**
+         * 1 0 4 home 3 usr 3 www
+         *
+         *   1
+         *     path type (ServerType)
+         *
+         *   0
+         *     prefix length
+         *
+         *   4 home
+         *     4 - length of "home"
+         *
+         *   3 usr
+         *     3 - length of "usr"
+         *
+         *   3 www
+         *     3 - length of "www"
+         */
+        $remoteDirectory = $this->remoteDirectory;
 
-			if ($pathType === ServerType::UNIX) {
-				$path = '/' . $path;
-			}
+        if (preg_match('~^(\d+)\s+(\d+)\s+(.+)$~', $remoteDirectory, $match)) {
+            $pathType = (int)$match[1];
+            $prefixLength = (int)$match[2];
 
-			return $path;
-		}
+            $offset = 0;
 
-		return '/';
-	}
+            $pathSegments = [];
 
-	public function getHost() {
-		return $this->host;
-	}
+            while (preg_match('~(\d+)~', $match[3], $pathLengthMatch, PREG_OFFSET_CAPTURE, $offset)) {
+                $pathStringLength = strlen($pathLengthMatch[1][0]);
+                $pathLength = (int)$pathLengthMatch[1][0];
+                $pathLengthOffset = (int)$pathLengthMatch[1][1];
 
-	public function getPort() {
-		return $this->port;
-	}
+                $pathSegments[] = substr($match[3], $pathLengthOffset + $pathStringLength + 1, $pathLength);
 
-	public function getProtocol() {
-		return $this->protocol;
-	}
+                $offset = $pathLengthOffset + $pathStringLength + $pathLength + 1;
+            }
 
-	public function getType() {
-		return $this->type;
-	}
+            $directorySeparator = '/';
 
-	public function getUser() {
-		return $this->user;
-	}
+            if ($pathType === ServerType::DOS) {
+                $directorySeparator = '\\';
+            }
 
-	public function getPassword() {
-		return $this->password;
-	}
+            $path = implode($directorySeparator, $pathSegments);
 
-	public function getLogonType() {
-		return $this->logonType;
-	}
+            if ($pathType === ServerType::UNIX) {
+                $path = '/' . $path;
+            }
 
-	public function getTimezoneOffset() {
-		return $this->timezoneOffset;
-	}
+            return $path;
+        }
 
-	public function getPassiveMode() {
-		return $this->passiveMode;
-	}
+        return $default;
+    }
 
-	public function getMaximumMultipleConnections() {
-		return $this->maximumMultipleConnections;
-	}
+    /**
+     * Gets the server host
+     *
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
 
-	public function getEncodingType() {
-		return $this->encodingType;
-	}
+    /**
+     * Gets the server port
+     *
+     * @return int
+     */
+    public function getPort()
+    {
+        return $this->port;
+    }
 
-	public function getBypassProxy() {
-		return $this->bypassProxy;
-	}
+    /**
+     * Gets the server protocol
+     *
+     * @see ServerProtocol
+     *
+     * @return int
+     */
+    public function getProtocol()
+    {
+        return $this->protocol;
+    }
 
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * Gets the server type
+     *
+     * @see ServerType
+     *
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 
-	public function getComments() {
-		return $this->comments;
-	}
+    /**
+     * Gets the server username
+     *
+     * @return string
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
-	public function getLocalDirectory() {
-		return $this->localDirectory;
-	}
+    /**
+     * Gets the server password
+     *
+     * @return string
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
 
-	public function getSyncronizedBrowsing() {
-		return $this->syncronizedBrowsing;
-	}
+    /**
+     * Gets the server key file (private key) if one is present
+     *
+     * @return string|null
+     */
+    public function getKeyFile()
+    {
+        return $this->keyFile;
+    }
 
-	public function getDirectoryComparison() {
-		return $this->directoryComparison;
-	}
+    /**
+     * Gets the server login type
+     *
+     * @see LogonType
+     *
+     * @return int
+     */
+    public function getLogonType()
+    {
+        return $this->logonType;
+    }
+
+    /**
+     * Gets the server timezone offset
+     *
+     * @return int
+     */
+    public function getTimezoneOffset()
+    {
+        return $this->timezoneOffset;
+    }
+
+    /**
+     * Gets the server passive mode setting
+     *
+     * @see PassiveMode
+     *
+     * @return int
+     */
+    public function getPassiveMode()
+    {
+        return $this->passiveMode;
+    }
+
+    /**
+     * Gets the maximum allowed concurrent connections
+     *
+     * @note 0 means no limit
+     *
+     * @return int
+     */
+    public function getMaximumMultipleConnections()
+    {
+        return $this->maximumMultipleConnections;
+    }
+
+    /**
+     * Gets the encoding type of the server
+     *
+     * @see CharsetEncoding
+     *
+     * @return int
+     */
+    public function getEncodingType()
+    {
+        return $this->encodingType;
+    }
+
+    /**
+     * Gets whether or not to bypass the proxy
+     *
+     * @return bool
+     */
+    public function getBypassProxy()
+    {
+        return $this->bypassProxy;
+    }
+
+    /**
+     * Gets the server name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Gets the server comments
+     *
+     * @return string
+     */
+    public function getComments()
+    {
+        return $this->comments;
+    }
+
+    /**
+     * Gets the initial local directory
+     *
+     * @return string
+     */
+    public function getLocalDirectory()
+    {
+        return $this->localDirectory;
+    }
+
+    /**
+     * Gets whether or not to use synchronized browsing
+     *
+     * @return bool
+     */
+    public function getSynchronizedBrowsing()
+    {
+        return $this->synchronizedBrowsing;
+    }
+
+    /**
+     * Gets whether or not to use directory comparison
+     *
+     * @return bool
+     */
+    public function getDirectoryComparison()
+    {
+        return $this->directoryComparison;
+    }
+
+    /**
+     * Gets the Flysystem adapter timeout
+     *
+     * @return int
+     */
+    private function getFlysystemAdapterTimeout() {
+        return 10;
+    }
+
+    /**
+     * Gets a Flysystem adapter from the profile
+     *
+     * @param int $directoryPerm The directory perm to create the Flysystem adapters with
+     *
+     * @return \League\Flysystem\Filesystem
+     *
+     * @throws \Exception
+     */
+    public function getFileSystem($directoryPerm = 0755)
+    {
+        $flySystemAdapter = null;
+
+        $serverProtocol = $this->getProtocol();
+
+        switch ($serverProtocol) {
+            case ServerProtocol::FTP:
+            case ServerProtocol::INSECURE_FTP:
+            case ServerProtocol::FTPS:
+            case ServerProtocol::FTPES:
+                // FTP
+                $ssl = $serverProtocol === ServerProtocol::FTPS || $serverProtocol === ServerProtocol::FTPES;
+                $passiveMode = $this->getPassiveMode() === PassiveMode::MODE_PASSIVE;
+
+                if ($ssl) {
+                    if ($passiveMode) {
+                        // CurlFtpAdapter has no "passive" setting
+                        // Ftp adapter has no implicit SSL
+                        throw new \Exception(sprintf('Cannot use both SSL FTP and passive mode in FTP connection'));
+                    }
+
+                    $flySystemAdapter = new CurlFtpAdapter([
+                        'host'          => $this->getHost(),
+                        'port'          => $this->getPort(),
+                        'username'      => $this->getUser(),
+                        'password'      => $this->getPassword(),
+                        'root'          => $this->getRemoteDirectory(),
+                        'timeout'       => $this->getFlysystemAdapterTimeout(),
+                        'directoryPerm' => $directoryPerm,
+                        'ssl'           => $serverProtocol === ServerProtocol::FTPS ? CurlFtpAdapter::SSL_IMPLICIT : CurlFtpAdapter::SSL_EXPLICIT,
+                    ]);
+                } else {
+                    $flySystemAdapter = new Ftp([
+                        'host'          => $this->getHost(),
+                        'port'          => $this->getPort(),
+                        'username'      => $this->getUser(),
+                        'password'      => $this->getPassword(),
+                        'passive'       => $passiveMode,
+                        'root'          => $this->getRemoteDirectory(),
+                        'timeout'       => $this->getFlysystemAdapterTimeout(),
+                        'directoryPerm' => $directoryPerm,
+                        'ssl'           => $ssl
+                    ]);
+                }
+
+                break;
+            case ServerProtocol::SFTP:
+                // SFTP
+                $flySystemAdapter = new SftpAdapter([
+                    'host'          => $this->getHost(),
+                    'port'          => $this->getPort(),
+                    'username'      => $this->getUser(),
+                    'password'      => $this->getPassword(),
+                    'privateKey'    => $this->getKeyFile(),
+                    'root'          => $this->getRemoteDirectory(),
+                    'timeout'       => $this->getFlysystemAdapterTimeout(),
+                    'directoryPerm' => $directoryPerm
+                ]);
+
+                break;
+        }
+
+        if (empty($flySystemAdapter)) {
+            throw new \Exception(sprintf('FlySystem adapter for server protocol %s not found',
+                ServerProtocol::getConstantName($serverProtocol)));
+        }
+
+        // Return the Flysystem FileSystem instance
+        return new Filesystem($flySystemAdapter);
+    }
 }

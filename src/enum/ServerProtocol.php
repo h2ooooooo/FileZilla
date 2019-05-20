@@ -13,7 +13,7 @@ namespace jalsoedesign\FileZilla\enum;
  *
  * @package jalsoedesign\FileZilla\enum
  *
- * @see https://github.com/basvodde/filezilla/blob/8f874dfe2fdfee4a95cf706bc860252a5793c32e/src/include/server.h
+ * @see https://svn.filezilla-project.org/svn/FileZilla3/trunk/src/include/server.h
  */
 class ServerProtocol extends Enum {
 	const UNKNOWN = -1;
@@ -24,5 +24,25 @@ class ServerProtocol extends Enum {
 	const FTPES = 4; //  FTP over explicit TLS
 	const HTTPS = 5; // HTTP over TLS
 	const INSECURE_FTP = 6; // Insecure File Transfer Protocol
-	const S3 = 7; // Amazon Simple Storage Service
+
+    const S3 = 7; // Amazon Simple Storage Service
+
+    const STORJ = 8;
+    const WEBDAV = 9;
+
+    const AZURE_FILE = 10;
+    const AZURE_BLOB = 11;
+
+    const SWIFT = 12;
+
+    const GOOGLE_CLOUD = 13;
+    const GOOGLE_DRIVE = 14;
+
+    const DROPBOX = 15;
+
+    const ONEDRIVE = 16;
+
+    const B2 = 17;
+
+    const BOX = 18;
 }

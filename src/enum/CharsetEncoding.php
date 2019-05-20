@@ -13,7 +13,7 @@ namespace jalsoedesign\FileZilla\enum;
  *
  * @package jalsoedesign\FileZilla\enum
  *
- * @see https://github.com/basvodde/filezilla/blob/8f874dfe2fdfee4a95cf706bc860252a5793c32e/src/include/server.h
+ * @see https://svn.filezilla-project.org/svn/FileZilla3/trunk/src/include/server.h
  */
 class CharsetEncoding extends Enum {
 	const ENCODING_AUTO = 0;

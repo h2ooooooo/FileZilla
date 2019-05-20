@@ -17,8 +17,7 @@
         "php": ">=5.4",
         "league/flysystem": "^1.0",
         "league/flysystem-sftp": "^1.0",
-        "vladimir-yuldashev/flysystem-curlftp": "^2.0",
-        "vaimo/composer-patches": "^4.16"
+        "chinlung/flysystem-curlftp": "^2.0"
     },
     "require-dev": {
         "jalsoedesign/climax": "master-dev"
@@ -27,8 +26,5 @@
         "psr-4": {
             "jalsoedesign\\FileZilla\\": "src/"
         }
-    },
-    "extra": {
-        "patches-search": "patches"
     }
 }

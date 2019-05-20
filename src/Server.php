@@ -10,7 +10,7 @@ use jalsoedesign\FileZilla\enum\ServerType;
 use League\Flysystem\Adapter\Ftp;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Sftp\SftpAdapter;
-use VladimirYuldashev\Flysystem\CurlFtpAdapter;
+use ChinLung\Flysystem\CurlFtpAdapter;
 
 /**
  * Class Server
@@ -391,38 +391,36 @@ class Server
             case ServerProtocol::FTPES:
                 // FTP
                 $ssl = $serverProtocol === ServerProtocol::FTPS || $serverProtocol === ServerProtocol::FTPES;
-                $passiveMode = $this->getPassiveMode() === PassiveMode::MODE_PASSIVE;
+                $passiveMode = $this->getPassiveMode();
+                $enablePassiveMode = $passiveMode === PassiveMode::MODE_PASSIVE;
 
-                if ($ssl) {
-                    if ($passiveMode) {
-                        // CurlFtpAdapter has no "passive" setting
-                        // Ftp adapter has no implicit SSL
-                        throw new \Exception(sprintf('Cannot use both SSL FTP and passive mode in FTP connection'));
-                    }
-
-                    $flySystemAdapter = new CurlFtpAdapter([
-                        'host'          => $this->getHost(),
-                        'port'          => $this->getPort(),
-                        'username'      => $this->getUser(),
-                        'password'      => $this->getPassword(),
-                        'root'          => $this->getRemoteDirectory(),
-                        'timeout'       => $this->getFlysystemAdapterTimeout(),
-                        'directoryPerm' => $directoryPerm,
-                        'ssl'           => $serverProtocol === ServerProtocol::FTPS ? CurlFtpAdapter::SSL_IMPLICIT : CurlFtpAdapter::SSL_EXPLICIT,
-                    ]);
-                } else {
-                    $flySystemAdapter = new Ftp([
-                        'host'          => $this->getHost(),
-                        'port'          => $this->getPort(),
-                        'username'      => $this->getUser(),
-                        'password'      => $this->getPassword(),
-                        'passive'       => $passiveMode,
-                        'root'          => $this->getRemoteDirectory(),
-                        'timeout'       => $this->getFlysystemAdapterTimeout(),
-                        'directoryPerm' => $directoryPerm,
-                        'ssl'           => $ssl
-                    ]);
+                if ($passiveMode === PassiveMode::MODE_DEFAULT) {
+	                $enablePassiveMode = true;
                 }
+
+		        $flySystemAdapter = new CurlFtpAdapter([
+			        'host'          => $this->getHost(),
+			        'port'          => $this->getPort(),
+			        'username'      => $this->getUser(),
+			        'password'      => $this->getPassword(),
+			        'root'          => $this->getRemoteDirectory(),
+			        'timeout'       => $this->getFlysystemAdapterTimeout(),
+			        'passive'       => $enablePassiveMode,
+			        'directoryPerm' => $directoryPerm,
+			        'ssl'           => $ssl,
+			        'ftps'          => $serverProtocol === ServerProtocol::FTPS,
+		        ]);
+
+		        try {
+			        // Try to get the connection to see if we can connect
+			        $flySystemAdapter->getConnection();
+		        } catch (\Exception $e) {
+			        // Set passive to the opposite of what it was and try to fall back on that
+			        $flySystemAdapter->setPassive(!$enablePassiveMode);
+
+			        // Try co connect again
+			        $flySystemAdapter->getConnection();
+		        }
 
                 break;
             case ServerProtocol::SFTP:

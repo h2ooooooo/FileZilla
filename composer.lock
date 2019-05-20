@@ -1,11 +1,64 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3d231bc4620ea13297dbd80a8a46dd16",
+    "content-hash": "c728f18301491b33db1bbacf2e2d408b",
     "packages": [
+        {
+            "name": "chinlung/flysystem-curlftp",
+            "version": "v2.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chinlung/flysystem-curlftp.git",
+                "reference": "113ed46d11b8c9c71ba837f2a9164913aae53523"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chinlung/flysystem-curlftp/zipball/113ed46d11b8c9c71ba837f2a9164913aae53523",
+                "reference": "113ed46d11b8c9c71ba837f2a9164913aae53523",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-intl": "*",
+                "league/flysystem": "^1.0",
+                "php": ">=5.5.9"
+            },
+            "require-dev": {
+                "fzaninotto/faker": "^1.6",
+                "larapack/dd": "^1.1",
+                "phpunit/phpunit": "^4",
+                "sllh/php-cs-fixer-styleci-bridge": "^2.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ChinLung\\Flysystem\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Vladimir Yuldashev",
+                    "email": "misterio92@gmail.com"
+                },
+                {
+                    "name": "Alexander Rubtsov",
+                    "email": "RubtsovAV@gmail.com"
+                },
+                {
+                    "name": "ChinLung Shih",
+                    "email": "chinlung.shih@gmail.com"
+                }
+            ],
+            "description": "Flysystem Adapter for the FTP with cURL implementation",
+            "time": "2019-04-30T09:10:58+00:00"
+        },
         {
             "name": "league/flysystem",
             "version": "1.0.51",
@@ -133,53 +186,6 @@
             "time": "2019-04-25T10:20:55+00:00"
         },
         {
-            "name": "marcj/topsort",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/marcj/topsort.php.git",
-                "reference": "387086c2db60ee0a27ac5df588c0f0b30c6bdc4b"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/marcj/topsort.php/zipball/387086c2db60ee0a27ac5df588c0f0b30c6bdc4b",
-                "reference": "387086c2db60ee0a27ac5df588c0f0b30c6bdc4b",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4"
-            },
-            "require-dev": {
-                "codeclimate/php-test-reporter": "dev-master",
-                "phpunit/phpunit": "~4.0",
-                "symfony/console": "~2.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "MJS\\TopSort\\": "src/",
-                    "MJS\\TopSort\\Tests\\": "tests/Tests/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marc J. Schmidt",
-                    "email": "marc@marcjschmidt.de"
-                }
-            ],
-            "description": "High-Performance TopSort/Dependency resolving algorithm",
-            "keywords": [
-                "dependency resolving",
-                "topological sort",
-                "topsort"
-            ],
-            "time": "2016-11-19T14:58:11+00:00"
-        },
-        {
             "name": "phpseclib/phpseclib",
             "version": "2.0.15",
             "source": {
@@ -270,250 +276,6 @@
                 "x509"
             ],
             "time": "2019-03-10T16:53:45+00:00"
-        },
-        {
-            "name": "seld/jsonlint",
-            "version": "1.7.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Seldaek/jsonlint.git",
-                "reference": "d15f59a67ff805a44c50ea0516d2341740f81a38"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/d15f59a67ff805a44c50ea0516d2341740f81a38",
-                "reference": "d15f59a67ff805a44c50ea0516d2341740f81a38",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^5.3 || ^7.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
-            },
-            "bin": [
-                "bin/jsonlint"
-            ],
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Seld\\JsonLint\\": "src/Seld/JsonLint/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Jordi Boggiano",
-                    "email": "j.boggiano@seld.be",
-                    "homepage": "http://seld.be"
-                }
-            ],
-            "description": "JSON Linter",
-            "keywords": [
-                "json",
-                "linter",
-                "parser",
-                "validator"
-            ],
-            "time": "2018-01-24T12:46:19+00:00"
-        },
-        {
-            "name": "tivie/php-os-detector",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/tivie/php-os-detector.git",
-                "reference": "9461dcd85c00e03842264f2fc8ccdc8d46867321"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/tivie/php-os-detector/zipball/9461dcd85c00e03842264f2fc8ccdc8d46867321",
-                "reference": "9461dcd85c00e03842264f2fc8ccdc8d46867321",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "4.3.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Tivie\\OS\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "APACHE 2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Estevão Soares dos Santos",
-                    "email": "estevao@soares-dos-santos.com"
-                }
-            ],
-            "description": "A small utility library that detects the OS the server is running on",
-            "homepage": "http://tivie.github.com/php-os-detector/",
-            "keywords": [
-                "detection",
-                "detector",
-                "identification",
-                "operating system",
-                "os",
-                "os detection"
-            ],
-            "time": "2017-10-21T03:33:59+00:00"
-        },
-        {
-            "name": "vaimo/composer-patches",
-            "version": "4.16.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vaimo/composer-patches.git",
-                "reference": "aa72bc414a8e207b3a5fc899308e4c5c850eb72f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vaimo/composer-patches/zipball/aa72bc414a8e207b3a5fc899308e4c5c850eb72f",
-                "reference": "aa72bc414a8e207b3a5fc899308e4c5c850eb72f",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0",
-                "ext-json": "*",
-                "marcj/topsort": "^1.0",
-                "php": ">=5.3.0",
-                "seld/jsonlint": "^1.7.1",
-                "tivie/php-os-detector": "^1.0"
-            },
-            "require-dev": {
-                "composer/composer": "^1.0.0",
-                "vaimo/composer-changelogs": "^0.15.0",
-                "vaimo/composer-patches-proxy": "*"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "Vaimo\\ComposerPatches\\Plugin",
-                "changelog": {
-                    "source": "changelog.json",
-                    "output": {
-                        "md": "CHANGELOG.md"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Vaimo\\ComposerPatches\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Allan Paiste",
-                    "email": "allan.paiste@vaimo.com"
-                }
-            ],
-            "description": "Applies a patch from a local or remote file to any package that is part of a given composer project. Patches can be defined both on project and on package level. Optional support for patch versioning, sequencing, custom patch applier configuration and patch command for testing/troubleshooting added patches.",
-            "keywords": [
-                "Fixes",
-                "back-ports",
-                "backports",
-                "bulk patches",
-                "bundled patches",
-                "composer command",
-                "composer plugin",
-                "configurable patch applier",
-                "development patches",
-                "downloaded patches",
-                "environment flags",
-                "hot-fixes",
-                "hotfixes",
-                "indirect restrictions",
-                "maintenance",
-                "maintenance tools",
-                "multi-version patches",
-                "multiple formats",
-                "os-specific config",
-                "package bug-fix",
-                "package patches",
-                "patch branching",
-                "patch command",
-                "patch description",
-                "patch exclusion",
-                "patch header",
-                "patch meta-data",
-                "patch resolve",
-                "patch search",
-                "patch skipping",
-                "patcher",
-                "patching",
-                "plugin",
-                "remote patch files",
-                "resolve patches",
-                "skipped packages",
-                "tools",
-                "utilities",
-                "utility",
-                "utils",
-                "version restriction"
-            ],
-            "time": "2019-04-09T20:49:30+00:00"
-        },
-        {
-            "name": "vladimir-yuldashev/flysystem-curlftp",
-            "version": "v2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vyuldashev/flysystem-curlftp.git",
-                "reference": "a264be737f84b20d231c92b1c713b4b10e44df03"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/vyuldashev/flysystem-curlftp/zipball/a264be737f84b20d231c92b1c713b4b10e44df03",
-                "reference": "a264be737f84b20d231c92b1c713b4b10e44df03",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-intl": "*",
-                "league/flysystem": "^1.0",
-                "php": ">=5.5.9"
-            },
-            "require-dev": {
-                "fzaninotto/faker": "^1.6",
-                "larapack/dd": "^1.1",
-                "phpunit/phpunit": "^4",
-                "sllh/php-cs-fixer-styleci-bridge": "^2.1"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "VladimirYuldashev\\Flysystem\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Vladimir Yuldashev",
-                    "email": "misterio92@gmail.com"
-                },
-                {
-                    "name": "Alexander Rubtsov",
-                    "email": "RubtsovAV@gmail.com"
-                }
-            ],
-            "description": "Flysystem Adapter for the FTP with cURL implementation",
-            "time": "2018-10-15T07:56:53+00:00"
         }
     ],
     "packages-dev": [
@@ -527,9 +289,7 @@
             },
             "dist": {
                 "type": "vcs",
-                "url": "git@github.com:h2ooooooo/CLImax.git",
-                "reference": null,
-                "shasum": null
+                "url": "git@github.com:h2ooooooo/CLImax.git"
             },
             "require": {
                 "php": ">=5.4.0",
@@ -623,9 +383,8 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.4",
         "ext-dom": "*",
-        "ext-simplexml": "*"
+        "php": ">=5.4"
     },
     "platform-dev": []
 }

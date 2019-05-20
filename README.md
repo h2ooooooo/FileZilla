@@ -43,9 +43,13 @@ This example will:
 
 It can be run with `php ./tests/test-simple.php`.
 
-## Note
+## FTP Adapter patch
 
-In order to support implicit FTPS this package uses (``)[]. The problem with this package is that the support for explicit FTPS is faulty seeing as it prepends `ftps://` to the hostname, resulting in the initial connection to be SSL (explicit FTP should connect without SSL and enter the state instead).
+The built in FTP adapter from Flysystem doesn't really support SSL, and particularly not implicit SSL.
+
+[`vyuldashev/flysystem-curlftp`](https://github.com/vyuldashev/flysystem-curlftp) solves this issue by allowing implicit FTP through curl.
+
+The problem with this package is that the support for explicit FTPS is faulty, seeing as it prepends `ftps://` to the hostname, resulting in the initial connection to be SSL (explicit FTP should connect without SSL and enter the state instead).
 
 To fix this there's a patch applied automatically by composer located here:
 

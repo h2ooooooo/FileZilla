@@ -43,18 +43,6 @@ This example will:
 
 It can be run with `php ./tests/test-simple.php`.
 
-## FTP Adapter patch
-
-The built in FTP adapter from Flysystem doesn't really support SSL, and particularly not implicit SSL.
-
-[`vyuldashev/flysystem-curlftp`](https://github.com/vyuldashev/flysystem-curlftp) solves this issue by allowing implicit FTP through curl.
-
-The problem with this package is that the support for explicit FTPS is faulty, seeing as it prepends `ftps://` to the hostname, resulting in the initial connection to be SSL (explicit FTP should connect without SSL and enter the state instead).
-
-To fix this there's a patch applied automatically by composer located here:
-
-[`patches/CurlFtpAdapter_explicit_ftp.patch`](./patches/CurlFtpAdapter_explicit_ftp.patch)
-
 ## Dependencies
 
 The following composer libraries are used as dependencies:
@@ -64,6 +52,5 @@ The following composer libraries are used as dependencies:
 | [`ext-dom`](https://www.php.net/manual/en/book.dom.php)                                                       | `*`          | The [`DOM`](https://www.php.net/manual/en/book.dom.php) extension is required to read `sitemanager.xml` |
 | [`league/flysystem`](https://packagist.org/packages/league/flysystem)                                         | `^1.0`       | Flysystem is used to be able to call `$server->getFilesystem()`                                         |
 | [`league/flysystem-sftp`](https://packagist.org/packages/league/flysystem-sftp)                               | `^1.0`       | SFTP support for Flysystem                                                                              |
-| [`vladimir-yuldashev/flysystem-curlftp`](https://packagist.org/packages/vladimir-yuldashev/flysystem-curlftp) | `^2.0`       | FTPS support for Flysystem                                                                              |
-| [`vaimo/composer-patches`](https://packagist.org/packages/vaimo/composer-patches)                             | `^4.16`      | Ability to add patch to `flysystem-curlftp` to fix explicit FTP issue                                   |
-| [`jalsoedesign/climax`](https://packagist.org/packages/jalsoedesign/climax)                                   | `master-dev` | CLImax support for test application |
+| [`chinlung/flysystem-curlftp`](https://packagist.org/packages/chinlung/flysystem-curlftp)                     | `^2.0`       | Added implicit FTPS support for Flysystem                                                               |
+| [`jalsoedesign/climax`](https://packagist.org/packages/jalsoedesign/climax)                                   | `master-dev` | CLImax support for test application                                                                     |

@@ -42,3 +42,11 @@ This example will:
  - List the files in the root folder
 
 It can be run with `php ./tests/test-simple.php`.
+
+## Note
+
+In order to support implicit FTPS this package uses (``)[]. The problem with this package is that the support for explicit FTPS is faulty seeing as it prepends `ftps://` to the hostname, resulting in the initial connection to be SSL (explicit FTP should connect without SSL and enter the state instead).
+
+To fix this there's a patch applied automatically by composer located here:
+
+[`patches/CurlFtpAdapter_explicit_ftp.patch`](./patches/CurlFtpAdapter_explicit_ftp.patch)

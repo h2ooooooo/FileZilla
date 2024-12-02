@@ -1,6 +1,5 @@
 # FileZilla Configuration Parser
 
-[![Build Status](https://img.shields.io/github/workflow/status/h2ooooooo/FukeZukka/CI)](https://github.com/h2ooooooo/FileZilla/actions)
 [![Latest Stable Version](https://img.shields.io/packagist/v/jalsoedesign/filezilla.svg)](https://packagist.org/packages/jalsoedesign/filezilla)
 [![License](https://img.shields.io/packagist/l/jalsoedesign/filezilla.svg)](https://github.com/h2ooooooo/FileZilla/blob/main/LICENSE)
 

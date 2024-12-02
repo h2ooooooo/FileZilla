@@ -1,8 +1,8 @@
 # FileZilla Configuration Parser
 
-[![Build Status](https://img.shields.io/github/workflow/status/jalsoedesign/filezilla/CI)](https://github.com/jalsoedesign/filezilla/actions)
+[![Build Status](https://img.shields.io/github/workflow/status/jalsoedesign/filezilla/CI)](https://github.com/h2ooooooo/FileZilla/actions)
 [![Latest Stable Version](https://img.shields.io/packagist/v/jalsoedesign/filezilla.svg)](https://packagist.org/packages/jalsoedesign/filezilla)
-[![License](https://img.shields.io/packagist/l/jalsoedesign/filezilla.svg)](https://github.com/jalsoedesign/filezilla/blob/main/LICENSE)
+[![License](https://img.shields.io/packagist/l/jalsoedesign/filezilla.svg)](https://github.com/h2ooooooo/FileZilla/blob/main/LICENSE)
 
 A powerful PHP library for parsing and working with FileZilla `sitemanager.xml` files. It allows you to extract server
 details, manage configurations, and integrate FileZilla data into your PHP applications.

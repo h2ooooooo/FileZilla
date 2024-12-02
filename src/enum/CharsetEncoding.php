@@ -1,16 +1,16 @@
 <?php
 
-namespace jalsoedesign\FileZilla\enum;
+namespace jalsoedesign\filezilla\enum;
 
 /**
  * Class CharsetEncoding
  *
- * @package jalsoedesign\FileZilla\enum
+ * @package jalsoedesign\filezilla\enum
  *
- * @see https://svn.filezilla-project.org/svn/FileZilla3/trunk/src/include/server.h
+ * @see https://svn.filezilla-project.org/svn/FileZilla3/trunk/src/include/server.h- enum CharsetEncoding
  */
 class CharsetEncoding extends Enum {
-	const ENCODING_AUTO = 0;
-	const ENCODING_UTF8 = 1;
-	const ENCODING_CUSTO = 2;
+	const ENCODING_AUTO = 'Auto';
+	const ENCODING_UTF8 = 'UTF-8';
+	const ENCODING_CUSTOM = 'Custom';
 }

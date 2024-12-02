@@ -1,22 +1,20 @@
 <?php
 
-namespace jalsoedesign\FileZilla\enum;
+namespace jalsoedesign\filezilla\enum;
 
 /**
  * Class Enum
  *
- * @package jalsoedesign\FileZilla\enum
+ * @package jalsoedesign\filezilla\enum
  */
 class Enum {
     /**
      * Gets the name (constant) of a single constant by value
      *
-     * @param mixed $value The value to get the constant name from
+     * @param string|int $value The value to get the constant name from
      * @return string|null
-     *
-     * @throws \ReflectionException
      */
-	public static function getConstantName($value) {
+	public static function getConstantName(string|int $value) : ?string {
 		$constants = self::getConstants();
 
 		if (isset($constants[$value])) {
@@ -35,30 +33,24 @@ class Enum {
     /**
      * Gets the camelCase'd name (constant) of a single constant by value
      *
-     * @param mixed $value The value to get the constant name from
+     * @param string|int $value The value to get the constant name from
      * @return string|null
-     *
-     * @throws \ReflectionException
      */
-	public static function toCamelCase($value) {
+	public static function toCamelCase(string|int $value) : ?string {
 		$constantName = self::getConstantName($value);
 
-		// No, it's not a weird emoji - it's an underscore followed by any character
-		$constantName = preg_replace_callback('~_(.)~m', function($matches) {
+		// No, it's not a weird emoji - it's a regex matching an underscore followed by any character
+		return preg_replace_callback('~_(.)~m', function($matches) {
 			return strtoupper($matches[1]);
 		}, strtolower($constantName));
-
-		return $constantName;
 	}
 
     /**
      * Get all the constants using ReflectionClass
      *
      * @return array An array of constants from $reflectionClass->getConstants()
-     *
-     * @throws \ReflectionException
      */
-	private static function getConstants() {
+	private static function getConstants() : array {
         $reflectionClass = new \ReflectionClass(get_called_class());
 
         return $reflectionClass->getConstants();

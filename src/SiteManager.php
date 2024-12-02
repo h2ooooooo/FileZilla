@@ -1,68 +1,102 @@
 <?php
 
-namespace jalsoedesign\FileZilla;
+namespace jalsoedesign\filezilla;
 
 /**
  * Class SiteManager
  *
- * @package jalsoedesign\FileZilla
+ * @package jalsoedesign\filezilla
  */
-class SiteManager {
+class SiteManager extends Folder {
+	/** @var string The version from the sitemanager.xml config */
+	protected string $version;
+
+	/** @var string The platform from the sitemanager.xml config */
+	protected string $platform;
+
+	/** @var ValueEncoder The value encoder for different platforms */
+	protected ValueEncoder $valueEncoder;
+
     /**
-     * Automatically creates the site manager from %AppData%/FileZilla/sitemanager.xml
+     * Automatically creates the SiteManager from the default FileZilla configuration path
+     * based on the operating system.
      *
      * @return SiteManager
      *
      * @throws \Exception
      */
-    public static function fromAppData() {
-        $siteManagerPath = sprintf('%s/FileZilla/sitemanager.xml', getenv('appdata'));
+    public static function fromSystem() : SiteManager {
+        $siteManagerPath = null;
+
+	    if (stristr(PHP_OS, 'WIN')) {
+		    // Windows: %AppData%/FileZilla/sitemanager.xml
+		    $siteManagerPath = sprintf('%s/FileZilla/sitemanager.xml', getenv('APPDATA'));
+	    } else {
+		    // macOS, Linux and other UNIX-like systems: $HOME/.config/filezilla/sitemanager.xml
+		    $siteManagerPath = sprintf('%s/.config/filezilla/sitemanager.xml', getenv('HOME'));
+	    }
 
         if (!file_exists($siteManagerPath)) {
-            throw new \Exception(sprintf('Could not find sitemanager.xml at %s', $siteManagerPath));
+            throw new \Exception(sprintf('Could not find system sitemanager.xml at %s', $siteManagerPath));
         }
 
         return new SiteManager($siteManagerPath);
     }
 
-    /** @var Server[] */
-	protected $servers;
-
     /**
      * SiteManager constructor.
      *
-     * @param string $path The path to the sitemanager.xml file
-     *
-     * @note The file is located by default in %AppData%/FileZilla/sitemanager.xml
+     * @param $siteManagerPth $path The path to the sitemanager.xml file
      *
      * @throws \Exception If an invalid sitemanager.xml file was found
      */
-	public function __construct($path) {
+	public function __construct(string $siteManagerPth) {
 	    // Load the sitemanager.xml file
 	    $dom = new \DOMDocument();
-	    $dom->load($path);
+	    $dom->load($siteManagerPth);
+
+		$xpath = new \DOMXPath($dom);
+		$filezillaTag = $xpath->query('/FileZilla3')->item(0);
+
+		if ($filezillaTag === null) {
+			throw new \RuntimeException('FileZilla3 tag not found in the sitemanager.xml file.');
+		}
+
+		$this->version = $filezillaTag->getAttribute('version');
+		$this->platform = $filezillaTag->getAttribute('platform');
+
+		// At some point this needed conversion and suddenly it didn't - maybe delete ValueEncoder in the future
+		//$sourceEncoding = $this->platform === 'windows' ? 'Windows-1252' : 'UTF-8';
+		$sourceEncoding = 'UTF-8';
+
+		$this->valueEncoder = new ValueEncoder($sourceEncoding);
 
 	    $servers = $dom->getElementsByTagName('Servers');
 
 	    if ($servers->length <= 0) {
-	        throw new \Exception(sprintf('Could not find a <Servers> tag in the FileZilla config'));
+	        throw new \Exception('Could not find a <Servers> tag in the FileZilla config');
         }
 
-	    // Parse servers
-        $this->servers = $this->parseServers($servers->item(0));
+		$children = $this->parseServers($servers->item(0));
 
 	    // Clean up
 	    unset($dom);
+
+		parent::__construct('', [
+			'name' => '',
+			'children' => $children,
+		]);
 	}
 
     /**
      * Parses all servers recursively in a \DOMNode instance
      *
      * @param \DOMNode $node The dom node to currently search - will recursively be child nodes if any "Folder" tags are found
+     * @param string $folderPath The current folder path as the code iterates through the folders
      *
-     * @return Server[]
+     * @return Server[]|Folder[]
      */
-	protected function parseServers(\DOMNode $node) {
+	protected function parseServers(\DOMNode $node, string $folderPath = '') : array {
         $parsedServers = [];
 
         /** @var \DOMNodeList $childNodes */
@@ -75,12 +109,19 @@ class SiteManager {
                     // Iterate down through the folder to find servers inside of it
                     $folderName = $childNode->firstChild->textContent;
 
-                    $parsedServers[$folderName] = $this->parseServers($childNode);
+					$folderName = $this->valueEncoder->decode($folderName);
+
+                    $parsedServers[$folderName] = new Folder($folderPath, [
+						'name' => $folderName,
+	                    'children' => $this->parseServers($childNode, $this->getChildPath($folderName, $folderPath)),
+                    ]);
                 } else if ($childNode->nodeName === 'Server') {
                     // Found a server - let's parse this and add it to our $parsedServers array
-                    $server = ServerFactory::fromDomNode($childNode);
+                    $server = ServerFactory::createServerFromDomNode($this->valueEncoder, $folderPath, $childNode);
 
-                    $parsedServers[ $server->getName() ] = $server;
+					$serverName = $server->getName();
+
+                    $parsedServers[ $serverName ] = $server;
                 }
             }
         }
@@ -88,70 +129,21 @@ class SiteManager {
         return $parsedServers;
     }
 
-    /**
-     * Gets the name of all the servers in the sitemanager.xml file
-     *
-     * All of these names can be used in SiteManager->getServer()
-     *
-     * @return array An array of server names
-     */
-	public function getServerNames() {
-		return $this->__getServerNames($this->servers);
-	}
-
-    /**
-     * An internal recursive function to get server names
-     *
-     * @internal
-     *
-     * @param array $serverArray The current server array to look through
-     * @param string $prefix Whether to add a prefix or not (is used for sub-folders)
-     *
-     * @return array An array of server names
-     */
-	private function __getServerNames($serverArray, $prefix = null) {
-		$serverNames = [];
-
-		$_prefix = ($prefix !== null ? $prefix . '/' : '');
-
-		foreach ($serverArray as $key => $value) {
-			if ($value instanceof Server) {
-				$serverNames[] = $_prefix . $key;
-
-				continue;
-			}
-
-			$serverNames = array_merge(
-				$serverNames,
-				$this->__getServerNames($value, $_prefix . $key)
-			);
-		}
-
-		return $serverNames;
+	/**
+	 * Gets the config "version" from the main <FileZilla3> config tag
+	 *
+	 * @return string
+	 */
+	public function getVersion(): string {
+		return $this->version;
 	}
 
 	/**
-	 * @param string $server The path to the single server - will be the name in FileZilla along with the directories it's in
+	 * Gets the config "platform" from the main <FileZilla3> config tag
 	 *
-	 * @throws \Exception If a server by that name can't be found an exception will be thrown
-	 *
-	 * @return Server The server by that name
+	 * @return string
 	 */
-	public function getServer($server) {
-		$serverSplit = preg_split('~[\\\/]+~', trim($server, '\\\/ '), -1, PREG_SPLIT_NO_EMPTY);
-
-		$servers = $this->servers;
-
-		for ($i = 0, $len = count($serverSplit); $i < $len; $i++) {
-			$serverSplitPart = $serverSplit[ $i ];
-
-			if ( ! isset($servers[ $serverSplitPart ])) {
-				throw new \Exception(sprintf('Could not find server part "%s" (in "%s")', $serverSplitPart, $server));
-			}
-
-			$servers = $servers[ $serverSplitPart ];
-		}
-
-		return !empty($servers) ? $servers : null;
+	public function getPlatform(): string {
+		return $this->platform;
 	}
 }

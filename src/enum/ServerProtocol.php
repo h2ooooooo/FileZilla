@@ -1,13 +1,13 @@
 <?php
 
-namespace jalsoedesign\FileZilla\enum;
+namespace jalsoedesign\filezilla\enum;
 
 /**
  * Class ServerProtocol
  *
- * @package jalsoedesign\FileZilla\enum
+ * @package jalsoedesign\filezilla\enum
  *
- * @see https://svn.filezilla-project.org/svn/FileZilla3/trunk/src/include/server.h
+ * @see https://svn.filezilla-project.org/svn/FileZilla3/trunk/src/include/server.h - enum ServerProtocol
  */
 class ServerProtocol extends Enum {
 	const UNKNOWN = -1;
@@ -39,4 +39,18 @@ class ServerProtocol extends Enum {
     const B2 = 17;
 
     const BOX = 18;
+
+	const INSECURE_WEBDAV = 19;
+
+	const RACKSPACE = 20;
+
+	const STORJ_GRANT = 21;
+
+	const S3_SSO = 22;
+
+	const GOOGLE_CLOUD_SVC_ACC = 23;
+
+	const CLOUDFLARE_R2 = 24;
+
+	const MAX_VALUE = 24; // CLOUDFLARE_R2
 }

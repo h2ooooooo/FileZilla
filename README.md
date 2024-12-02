@@ -1,56 +1,248 @@
-# jalsoedesign/filezilla
+# FileZilla Configuration Parser
 
-[![Author](https://img.shields.io/badge/author-jalsoedesign-blue.svg?style=flat-square)](https://jalsoedesign.net)
-[![Software License](https://img.shields.io/github/license/h2ooooooo/FileZilla.svg?style=flat-square)](LICENSE)
-[![PHP Version](https://img.shields.io/packagist/php-v/jalsoedesign/filezilla.svg?style=flat-square)](https://packagist.org/packages/jalsoedesign/filezilla)
-[![Total Downloads](https://img.shields.io/packagist/dt/jalsoedesign/filezilla.svg?style=flat-square)](https://packagist.org/packages/jalsoedesign/filezilla)
-[![Github Issues](https://img.shields.io/github/issues/h2ooooooo/FileZilla.svg?style=flat-square)](https://github.com/jalsoedesign/filezilla/issues)
+[![Build Status](https://img.shields.io/github/workflow/status/jalsoedesign/filezilla/CI)](https://github.com/jalsoedesign/filezilla/actions)
+[![Latest Stable Version](https://img.shields.io/packagist/v/jalsoedesign/filezilla.svg)](https://packagist.org/packages/jalsoedesign/filezilla)
+[![License](https://img.shields.io/packagist/l/jalsoedesign/filezilla.svg)](https://github.com/jalsoedesign/filezilla/blob/main/LICENSE)
 
-FileZilla `sitemanager.xml` parser used to get details for specific servers and/or connect to them using [`thephpleague/flysystem`](https://github.com/thephpleague/flysystem).
+A powerful PHP library for parsing and working with FileZilla `sitemanager.xml` files. It allows you to extract server
+details, manage configurations, and integrate FileZilla data into your PHP applications.
+
+---
+
+## Features
+
+- 🎉 **Parse FileZilla `sitemanager.xml` files**: Extract and work with server folders as well as individual server
+  details.
+- 🔒 **Stop using credentials in your code**: If FileZilla already provides this unencrypted, and you're already using
+  it, why not just read it from there?
+- ✨ **Supports all FileZilla server attributes**: Including host, port, protocol, and more.
+- 🔧 **Flexible API**: Query specific server details or all servers in a folder.
+- 📜 **Enum-Based Design**: Strongly typed enums for protocols, logon types, and more.
+- ⚙️ **Works out of the box**: The library defaults to the `sitemanager.xml` of your system. No need to specify a path.
+- 🚀 **PHP 8.0+ Compatible**: Built with modern PHP practices and strict typing.
+
+---
 
 ## Installation
 
-You can install the library using [`composer`](https://getcomposer.org/):
+Install the package via Composer:
 
-    composer require jalsoedesign/filezilla
+```bash
+composer require jalsoedesign/filezilla
+```
 
-After this simply require `./vendor/autoload.php` and you can use the classes.
-## Examples
+---
 
-### CLImax example
- 
-The example can be found at [`tests/test-climax.php`](./tests/test-climax.php)
+## Usage
 
-This example will:
+### Basic usage
 
- - Open the `sitemanager.xml` fixture file
- - `[FTP]` Connect to `test.rebex.net:21` server and list files in the root folder 
- - `[FTPS]` Connect to `test.rebex.net:990` server and list files in the root folder 
- - `[FTPEX]` Connect to `test.rebex.net:21` server and list files in the root folder 
- - `[SFTP]` Connect to `test.rebex.net:22` server and list files in the root folder 
- 
-It can be run with `php ./tests/test-climax.php`.
+Load the default sitemanager.xml from your system (using `fromSystem()`) and iterate through all servers and print their
+name.
 
-### Simple example
- 
-The example can be found at [`tests/test-simple.php`](./tests/test-simple.php)
+```php
+use jalsoedesign\filezilla\SiteManager;
 
-This example will:
+$siteManager = SiteManager::fromSystem();
 
- - Open the `sitemanager.xml` fixture file
- - Connect to the test.rebex.net server using insecure FTP
- - List the files in the root folder
+$servers = $siteManager->getServers();
 
-It can be run with `php ./tests/test-simple.php`.
+foreach ($servers as $server) {
+    echo 'Full server path: ' . $server->getPath() . PHP_EOL;
+}
+```
 
-## Dependencies
+### Many other examples
 
-The following composer libraries are used as dependencies:
+See the [**examples folder**](./examples).
 
-| Library                                                                                                       | Version      | Reason                                                                                                  | 
-|---------------------------------------------------------------------------------------------------------------|--------------|---------------------------------------------------------------------------------------------------------|
-| [`ext-dom`](https://www.php.net/manual/en/book.dom.php)                                                       | `*`          | The [`DOM`](https://www.php.net/manual/en/book.dom.php) extension is required to read `sitemanager.xml` |
-| [`league/flysystem`](https://packagist.org/packages/league/flysystem)                                         | `^1.0`       | Flysystem is used to be able to call `$server->getFilesystem()`                                         |
-| [`league/flysystem-sftp`](https://packagist.org/packages/league/flysystem-sftp)                               | `^1.0`       | SFTP support for Flysystem                                                                              |
-| [`chinlung/flysystem-curlftp`](https://packagist.org/packages/chinlung/flysystem-curlftp)                     | `^2.0`       | Added implicit FTPS support for Flysystem                                                               |
-| [`jalsoedesign/climax`](https://packagist.org/packages/jalsoedesign/climax)                                   | `master-dev` | CLImax support for test application                                                                     |
+### Structure of sitemanager.xml
+
+The test fixture [`tests/fixtures/sitemanager.xml`](tests/fixtures/sitemanager.xml) provides an example of all possible
+options.
+
+<details>
+<summary>Folder structure of sitemanager.xml</summary>
+
+```
+📁 My Sites
+│   📁 Protocols
+│   ├── ☁️ azure-blob-storage.example.com
+│   ├── ☁️ azure-file-storage.example.com
+│   ├── ☁️ backblaze-b2.example.com
+│   ├── ☁️ box.example.com
+│   ├── ☁️ dropbox.example.com
+│   ├── 🌐 ftp.example.com - explicit ftp over tls
+│   ├── 🌐 ftp.example.com - explicit ftp over tls if available
+│   ├── 🌐 ftp.example.com - implicit ftp over tls
+│   ├── 🌐 ftp.example.com - plain ftp
+│   ├── 🌐 google-cloudstorage.example.com
+│   ├── ☁️ google-drive.example.com
+│   ├── ☁️ onedrive.example.com
+│   ├── ☁️ openstack-swift.example.com
+│   ├── ☁️ rackspace-cloud-storage.example.com
+│   ├── ☁️ s3.example.com
+│   ├── 🌐 sftp.example.com
+│   ├── 🌐 webdav.example.com - http
+│   ├── 🌐 webdav.example.com - https
+│   📁 Settings
+│   │   📁 Advanced
+│   │   ├── 🌐 _default
+│   │   │   📁 Adjusted server time
+│   │   │   ├── 🌐 minus 1 hour
+│   │   │   ├── 🌐 plus 1 hour
+│   │   │   ├── 🌐 plus 30 minutes
+│   │   │   📁 Bypass proxy
+│   │   │   ├── 🌐 disabled
+│   │   │   ├── 🌐 enabled
+│   │   │   📁 Directory comparison
+│   │   │   ├── 🌐 disabled
+│   │   │   ├── 🌐 enabled
+│   │   │   📁 Local directory
+│   │   │   ├── 🌐 local directory - Unix
+│   │   │   ├── 🌐 local directory - Windows
+│   │   │   📁 Remote directory
+│   │   │   ├── 🌐 remote directory - Unix
+│   │   │   ├── 🌐 remote directory - Windows
+│   │   │   📁 Server type
+│   │   │   ├── 🌐 cygwin
+│   │   │   ├── 🌐 default
+│   │   │   ├── 🌐 dos with back slashes
+│   │   │   ├── 🌐 dos with forward slashes
+│   │   │   ├── 🌐 doslike
+│   │   │   ├── 🌐 hp nonstop
+│   │   │   ├── 🌐 mvs
+│   │   │   ├── 🌐 unix
+│   │   │   ├── 🌐 vms
+│   │   │   ├── 🌐 vxworks
+│   │   │   ├── 🌐 zvm
+│   │   │   📁 Synchronized browsing
+│   │   │   ├── 🌐 disabled
+│   │   │   ├── 🌐 enabled
+│   │   📁 Charset
+│   │   ├── 🌐 autodetect
+│   │   ├── 🌐 custom charset - utf16
+│   │   ├── 🌐 force utf8
+│   │   📁 General
+│   │   │   📁 Background color
+│   │   │   ├── 🌐 none
+│   │   │   ├── 🌐 red
+│   │   │   📁 Comments
+│   │   │   ├── 🌐 no comments
+│   │   │   ├── 🌐 with comments
+│   │   │   📁 Custom port
+│   │   │   ├── 🌐 custom port 8080
+│   │   │   ├── 🌐 default port
+│   │   📁 Transfer Settings
+│   │   ├── 🌐 transfer mode - 6 limit
+│   │   ├── 🌐 transfer mode - Active
+│   │   ├── 🌐 transfer mode - Default
+│   │   ├── 🌐 transfer mode - No limit
+│   │   ├── 🌐 transfer mode - Passive
+│   📁 Various
+│   ├── 🌐 Special !"#¤%&()=<>
+│   ├── 🌐 Utf8 💞💢💫
+```
+
+</details>
+
+---
+
+## Documentation
+
+### API Reference
+
+#### Server
+
+The `Server` class represents a single server configuration from the FileZilla `sitemanager.xml` file. It provides
+access to all attributes of a server, including its host, protocol, directories, and more.
+
+| Method                                                                   | Returns | Description                                                             |
+|--------------------------------------------------------------------------|---------|-------------------------------------------------------------------------|
+| `getHost()`                                                              | string  | Get the server's hostname or IP address.                                |
+| `getPort()`                                                              | int     | Get the server's port number.                                           |
+| `getProtocol()`                                                          | int     | Get the server's protocol ([`ServerProtocol enum`](#Enums)).            |
+| `getLogonType()`                                                         | int     | Get the server's logon type ([`LogonType enum`](#Enums)).               |
+| `getUser()`                                                              | ?string | Get the username for authentication (nullable).                         |
+| `getPassword()`                                                          | ?string | Get the password for authentication (nullable).                         |
+| `getKeyFile()`                                                           | ?string | Get the path to the server's private key file (nullable).               |
+| `getTimezoneOffset()`                                                    | ?int    | Get the server's timezone offset (nullable).                            |
+| `getPassiveMode()`                                                       | ?string | Get the server's passive mode ([`PassiveMode enum`](#Enums), nullable). |
+| `getMaximumMultipleConnections()`                                        | ?int    | Get the maximum concurrent connections (nullable).                      |
+| `getEncodingType()`                                                      | ?string | Get the encoding type ([`CharsetEncoding enum`](#Enums), nullable).     |
+| `getCustomEncoding()`                                                    | ?string | Get the custom encoding if the encoding type is custom.                 |
+| `getBypassProxy()`                                                       | ?bool   | Check whether the server bypasses the proxy (nullable).                 |
+| `getType()`                                                              | int     | Get the server's type ([`ServerType enum`](#Enums)).                    |
+| `getName()`                                                              | string  | Get the name of the server as it appears in FileZilla.                  |
+| `getComments()`                                                          | ?string | Get the server's comments (nullable).                                   |
+| `getLocalDirectory()`                                                    | ?string | Get the initial local directory for the server (nullable).              |
+| `getRemoteDirectory(string $default = null, bool $useRootPrefix = true)` | ?string | Parse and return the server's remote directory (nullable).              |
+| `getSynchronizedBrowsing()`                                              | ?bool   | Check whether synchronized browsing is enabled (nullable).              |
+| `getDirectoryComparison()`                                               | ?bool   | Check whether directory comparison is enabled (nullable).               |
+| `getColour()`                                                            | int     | Get the background color.                                               |
+| `getColor()`                                                             | ?string | Alias for `getColour()` (nullable).                                     |
+
+#### Folder
+
+The `Folder` class represents a collection of `Server` and/or `Folder` objects, allowing for recursive structures of
+servers and folders.
+
+| Method                                                | Returns           | Description                                                                 |
+|-------------------------------------------------------|-------------------|-----------------------------------------------------------------------------|
+| `getName()`                                           | string            | Get the name of the folder.                                                 |
+| `getChildren(bool $recursive, ?string $filter)`       | Server[]/Folder[] | Get all children in the folder, optionally recursive and filtered by type.  |
+| `countServers(bool $recursive)`                       | int               | Count the number of servers in the folder, optionally including subfolders. |
+| `countFolders(bool $recursive)`                       | int               | Count the number of folders in the folder, optionally including subfolders. |
+| `getServers(bool $recursive)`                         | Server[]          | Get all servers in the folder, optionally including subfolders.             |
+| `getFolders(bool $recursive)`                         | Folder[]          | Get all folders in the folder, optionally including subfolders.             |
+| `getServer(string $serverPath)`                       | Server            | Get a specific server by its path.                                          |
+| `getFolder(string $folderPath)`                       | Folder            | Get a specific folder by its path.                                          |
+| `getChildPath(string $childName, ?string $childPath)` | string            | Construct a full path for a child within the folder.                        |
+
+#### SiteManager
+
+The `SiteManager` class extends `Folder`, inheriting all of its functionality, and represents the root structure of FileZilla's server and folder configuration as defined in the `sitemanager.xml` file. In addition to managing nested folders and servers, it provides access to metadata about the configuration file itself.
+
+| Method                      | Returns    | Description                                                               |
+|-----------------------------|------------|---------------------------------------------------------------------------|
+| `SiteManager::fromSystem()` | SiteManager | Create a `SiteManager` instance from the system's default configuration. |
+| `getVersion()`              | string     | Get the version of the `sitemanager.xml` file.                            |
+| `getPlatform()`             | string     | Get the platform specified in the `sitemanager.xml` file.                 |
+
+### Enums
+
+| Enum Class        | Description                                                      |
+|-------------------|------------------------------------------------------------------|
+| `CharsetEncoding` | Charset encodings (Auto, UTF-8 or Custom)                        |
+| `Colour`          | Background colours (e.g. Red, Green, Blue).                      |
+| `LogonType`       | User authentication types (e.g., Normal, Anonymous).             |
+| `PassiveType`     | The PasvMode setting (MODE_DEFAULT, MODE_ACTIVE or MODE_PASSIVE) |
+| `ServerProtocol`  | Server protocols like FTP, SFTP, FTPS, etc.                      |
+| `ServerType`      | Server types like Unix, DOS, etc.                                |
+
+All enum classes have `Enum::toCamelCase($value)` as well as `Enum::getConstantName($value)` methods.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please submit a pull request or open an issue if you find a bug or have an idea for an
+enhancement.
+
+---
+
+## License
+
+This library is open-sourced under the [MIT license](https://github.com/jalsoedesign/filezilla/blob/main/LICENSE).
+
+---
+
+## Credits
+
+- **Author**: [JalsoeDesign](https://www.jalsoedesign.net)
+
+---
+
+## Support
+
+If you find this library useful, feel free to ⭐ the repository or share your feedback!

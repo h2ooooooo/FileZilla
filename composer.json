@@ -16,7 +16,7 @@
     "scripts": {
         "test": [
             "php tests/ensure-fixtures-are-generated.php",
-            "phpunit --bootstrap vendor/autoload.php tests"
+            "phpunit -c phpunit.xml"
         ]
     },
     "require": {

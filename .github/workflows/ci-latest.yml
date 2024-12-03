@@ -20,4 +20,3 @@ jobs:
           configuration: phpunit.xml
           args: --coverage-text
           php_extensions: mbstring
-        coverage_clover: "coverage/clover.xml"

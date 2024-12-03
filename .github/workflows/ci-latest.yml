@@ -1,9 +1,6 @@
 name: PHPUnit Tests
 
-on:
-  push:
-    tags:
-      - 'v*.*.*' # Only run for version tags like v2.0.0, v2.1.1, etc.
+on: [push]
 
 jobs:
   build-test:

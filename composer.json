@@ -2,7 +2,7 @@
     "name": "jalsoedesign/filezilla",
     "type": "library",
     "description": "A powerful PHP library for parsing and working with FileZilla `sitemanager.xml` files. It allows you to extract server details, manage configurations, and integrate FileZilla data into your PHP applications.",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "homepage": "https://www.jalsoedesign.net",
     "license": "MIT",
     "authors": [

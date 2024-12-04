@@ -1,6 +1,6 @@
 <?php
 
-namespace jalsoedesign\filezilla;
+namespace Tests;
 
 class InternalFixtureGenerator {
 	private string $saveFolder;

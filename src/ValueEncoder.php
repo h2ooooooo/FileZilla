@@ -53,10 +53,8 @@ class ValueEncoder
 			return $value;
 		}
 
-		if (!function_exists('mb_convert_encoding')) {
-			return $value;
-		}
-
-		return mb_convert_encoding($value, $sourceEncoding, $destinationEncoding);
+		return function_exists('mb_convert_encoding')
+			? mb_convert_encoding($value, $sourceEncoding, $destinationEncoding)
+			: $value;
 	}
 }

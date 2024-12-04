@@ -17,7 +17,7 @@ class Enum {
 	public static function getConstantName(string|int $value) : ?string {
 		$constants = self::getConstants();
 
-		if (isset($constants[$value])) {
+		if (array_key_exists($value, $constants)) {
 			return $value;
 		}
 

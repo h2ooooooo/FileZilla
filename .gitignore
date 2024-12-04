@@ -2,3 +2,4 @@
 /vendor/
 /tests/fixtures/generated/
 /.phpunit.result.cache
+/.coverage/report

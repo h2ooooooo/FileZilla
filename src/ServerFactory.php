@@ -12,12 +12,16 @@ class ServerFactory {
 	 * Gets a Server instance from a DOMNode instance
 	 *
 	 * @param ValueEncoder $valueEncoder
-	 * @param string   $path
-	 * @param \DOMNode $domNode
+	 * @param string       $path
+	 * @param \DOMNode     $domNode
 	 *
 	 * @return \jalsoedesign\filezilla\Server
 	 */
-	public static function createServerFromDomNode(ValueEncoder $valueEncoder, string $path, \DOMNode $domNode): Server {
+	public static function createServerFromDomNode(
+		ValueEncoder $valueEncoder,
+		string $path,
+		\DOMNode $domNode
+	): Server {
 		// Set up a mapper to map XML fields to a properties array
 		$tagMapper = [
 			'Host'                       => 'host',
@@ -28,6 +32,7 @@ class ServerFactory {
 			'Pass'                       => 'password',
 			'Keyfile'                    => 'keyFile',
 			'Colour'                     => 'colour',
+			'Account'                    => 'account',
 			'Logontype'                  => 'logonType',
 			'TimezoneOffset'             => 'timezoneOffset',
 			'PasvMode'                   => 'passiveMode',
@@ -72,7 +77,7 @@ class ServerFactory {
 			$property = $tagMapper[ $nodeName ];
 
 			// Gets the string value of the xml element
-			$value = (string)$childNode->textContent;
+			$value = (string) $childNode->textContent;
 
 			$value = $valueEncoder->decode($value);
 

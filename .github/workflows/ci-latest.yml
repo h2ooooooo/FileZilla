@@ -19,4 +19,5 @@ jobs:
           bootstrap: vendor/autoload.php
           configuration: phpunit.xml
           args: --coverage-text
-          php_extensions: mbstring
+          php_extensions: "xdebug mbstring"
+          coverage_clover: "coverage/clover.xml"

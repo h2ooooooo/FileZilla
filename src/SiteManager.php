@@ -17,6 +17,25 @@ class SiteManager extends Folder {
 	/** @var ValueEncoder The value encoder for different platforms */
 	protected ValueEncoder $valueEncoder;
 
+	/**
+	 * Gets the path to the sitemanager.xml if it is installed
+	 *
+	 * @return string
+	 * @throws \Exception
+	 */
+	public static function getSystemSiteManagerPath() : string {
+		$operatingSystem = OsUtil::getOperatingSystem();
+
+		if (str_contains($operatingSystem, 'WIN')) {
+			// Windows: %AppData%/FileZilla/sitemanager.xml
+			$siteManagerPath = sprintf('%s/FileZilla/sitemanager.xml', OsUtil::getEnv('APPDATA'));
+		} else {
+			// macOS, Linux and other UNIX-like systems: $HOME/.config/filezilla/sitemanager.xml
+			$siteManagerPath = sprintf('%s/.config/filezilla/sitemanager.xml', OsUtil::getEnv('HOME'));
+		}
+
+		return $siteManagerPath;
+	}
     /**
      * Automatically creates the SiteManager from the default FileZilla configuration path
      * based on the operating system.
@@ -26,34 +45,32 @@ class SiteManager extends Folder {
      * @throws \Exception
      */
     public static function fromSystem() : SiteManager {
-        $siteManagerPath = null;
-
-	    if (stristr(PHP_OS, 'WIN')) {
-		    // Windows: %AppData%/FileZilla/sitemanager.xml
-		    $siteManagerPath = sprintf('%s/FileZilla/sitemanager.xml', getenv('APPDATA'));
-	    } else {
-		    // macOS, Linux and other UNIX-like systems: $HOME/.config/filezilla/sitemanager.xml
-		    $siteManagerPath = sprintf('%s/.config/filezilla/sitemanager.xml', getenv('HOME'));
-	    }
-
-        if (!file_exists($siteManagerPath)) {
-            throw new \Exception(sprintf('Could not find system sitemanager.xml at %s', $siteManagerPath));
-        }
-
-        return new SiteManager($siteManagerPath);
+        return new SiteManager(static::getSystemSiteManagerPath());
     }
 
     /**
      * SiteManager constructor.
      *
-     * @param $siteManagerPth $path The path to the sitemanager.xml file
+     * @param $siteManagerPath $path The path to the sitemanager.xml file
      *
      * @throws \Exception If an invalid sitemanager.xml file was found
      */
-	public function __construct(string $siteManagerPth) {
+	public function __construct(string $siteManagerPath) {
+		if (!file_exists($siteManagerPath)) {
+			throw new \Exception(sprintf('Could not find sitemanager.xml at %s', $siteManagerPath));
+		}
+
 	    // Load the sitemanager.xml file
 	    $dom = new \DOMDocument();
-	    $dom->load($siteManagerPth);
+
+		if (!@$dom->load($siteManagerPath)) {
+			$error = error_get_last();
+
+			throw new \Exception(sprintf(
+				'Could not load sitemanager.xml: %s',
+				!empty($error['message']) ? $error['message'] : 'Unknown'
+			));
+		}
 
 		$xpath = new \DOMXPath($dom);
 		$filezillaTag = $xpath->query('/FileZilla3')->item(0);

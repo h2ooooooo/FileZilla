@@ -45,6 +45,9 @@ class Server extends AbstractServerFolderChild
 	/** @var string|null The path to the server key file (optional) */
 	protected ?string $keyFile = null;
 
+	/** @var string|null The account of the server (optional) */
+	protected ?string $account = null;
+
 	/** @var int|null The background colour (optional) */
 	protected ?int $colour = null;
 
@@ -183,6 +186,16 @@ class Server extends AbstractServerFolderChild
 	}
 
 	/**
+	 * Gets the server auth account
+	 *
+	 * @return ?string Nullable account field
+	 */
+	public function getAccount() : ?string
+	{
+		return $this->account;
+	}
+
+	/**
 	 * Gets the server background colour
 	 *
 	 * @return int Background colour, defaults to Colour::NONE
@@ -201,9 +214,9 @@ class Server extends AbstractServerFolderChild
 	/**
 	 * Alias for $this->getColour()
 	 *
-	 * @return ?string Nullable background colour
+	 * @return int Background colour (alias)
 	 */
-	public function getColor(): ?string
+	public function getColor(): int
 	{
 		return $this->getColour();
 	}

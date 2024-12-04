@@ -200,13 +200,15 @@ servers and folders.
 
 #### SiteManager
 
-The `SiteManager` class extends `Folder`, inheriting all of its functionality, and represents the root structure of FileZilla's server and folder configuration as defined in the `sitemanager.xml` file. In addition to managing nested folders and servers, it provides access to metadata about the configuration file itself.
+The `SiteManager` class extends `Folder`, inheriting all of its functionality, and represents the root structure of
+FileZilla's server and folder configuration as defined in the `sitemanager.xml` file. In addition to managing nested
+folders and servers, it provides access to metadata about the configuration file itself.
 
-| Method                      | Returns    | Description                                                               |
-|-----------------------------|------------|---------------------------------------------------------------------------|
+| Method                      | Returns     | Description                                                              |
+|-----------------------------|-------------|--------------------------------------------------------------------------|
 | `SiteManager::fromSystem()` | SiteManager | Create a `SiteManager` instance from the system's default configuration. |
-| `getVersion()`              | string     | Get the version of the `sitemanager.xml` file.                            |
-| `getPlatform()`             | string     | Get the platform specified in the `sitemanager.xml` file.                 |
+| `getVersion()`              | string      | Get the version of the `sitemanager.xml` file.                           |
+| `getPlatform()`             | string      | Get the platform specified in the `sitemanager.xml` file.                |
 
 ### Enums
 
@@ -220,6 +222,32 @@ The `SiteManager` class extends `Folder`, inheriting all of its functionality, a
 | `ServerType`      | Server types like Unix, DOS, etc.                                |
 
 All enum classes have `Enum::toCamelCase($value)` as well as `Enum::getConstantName($value)` methods.
+
+## Filezilla config parsing
+
+| FileZilla Field            | Attribute                  | Casting | Note                                            |
+|----------------------------|----------------------------|---------|-------------------------------------------------|
+| Host                       | host                       | string  | Required                                        |
+| Port                       | port                       | int     |                                                 |
+| Protocol                   | protocol                   | int     |                                                 |
+| Type                       | type                       | int     |                                                 |
+| User                       | user                       | string  | Required                                        |
+| Pass                       | password                   | string  | Required. Base64 encoded if `encoding="base64"` |
+| Keyfile                    | keyFile                    | string  | Required                                        |
+| Colour                     | colour                     | int     |                                                 |
+| Logontype                  | logonType                  | int     |                                                 |
+| TimezoneOffset             | timezoneOffset             | int     |                                                 |
+| PasvMode                   | passiveMode                | string  | Required                                        |
+| MaximumMultipleConnections | maximumMultipleConnections | int     |                                                 |
+| EncodingType               | encodingType               | string  | Required                                        |
+| BypassProxy                | bypassProxy                | bool    |                                                 |
+| Name                       | name                       | string  | Required                                        |
+| Comments                   | comments                   | string  | Required                                        |
+| LocalDir                   | localDirectory             | string  | Required                                        |
+| RemoteDir                  | remoteDirectory            | string  | Required                                        |
+| SyncBrowsing               | synchronizedBrowsing       | bool    |                                                 |
+| DirectoryComparison        | directoryComparison        | bool    |                                                 |
+| CustomEncoding             | customEncoding             | string  | Required                                        |
 
 ---
 

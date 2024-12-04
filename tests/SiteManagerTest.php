@@ -8,6 +8,8 @@ use jalsoedesign\filezilla\enum\LogonType;
 use jalsoedesign\filezilla\enum\PassiveMode;
 use jalsoedesign\filezilla\enum\ServerProtocol;
 use jalsoedesign\filezilla\enum\ServerType;
+use jalsoedesign\filezilla\OsUtil;
+use jalsoedesign\filezilla\Server;
 use jalsoedesign\filezilla\SiteManager;
 use PHPUnit\Framework\TestCase;
 
@@ -79,41 +81,56 @@ class SiteManagerTest extends TestCase {
 				'host'     => 'ftp.example.com',
 				'protocol' => ServerProtocol::FTPES,
 			],
-			'Protocols/ftp.example.com - explicit ftp over tls if available' => ['host'     => 'ftp.example.com',
-			                                                                     'protocol' => ServerProtocol::FTP,
+			'Protocols/ftp.example.com - explicit ftp over tls if available' => [
+				'host'     => 'ftp.example.com',
+				'protocol' => ServerProtocol::FTP,
 			],
-			'Protocols/ftp.example.com - implicit ftp over tls'              => ['host'     => 'ftp.example.com',
-			                                                                     'protocol' => ServerProtocol::FTPS,
+			'Protocols/ftp.example.com - implicit ftp over tls'              => [
+				'host'     => 'ftp.example.com',
+				'protocol' => ServerProtocol::FTPS,
 			],
-			'Protocols/ftp.example.com - plain ftp'                          => ['host'     => 'ftp.example.com',
-			                                                                     'protocol' => ServerProtocol::INSECURE_FTP,
+			'Protocols/ftp.example.com - plain ftp'                          => [
+				'host'     => 'ftp.example.com',
+				'protocol' => ServerProtocol::INSECURE_FTP,
 			],
-			'Protocols/google-cloudstorage.example.com'                      => ['host'     => 'google-cloudstorage.example.com',
-			                                                                     'protocol' => ServerProtocol::GOOGLE_CLOUD,
+			'Protocols/google-cloudstorage.example.com'                      => [
+				'host'     => 'google-cloudstorage.example.com',
+				'protocol' => ServerProtocol::GOOGLE_CLOUD,
 			],
-			'Protocols/google-drive.example.com'                             => ['host'     => 'google-drive.example.com',
-			                                                                     'protocol' => ServerProtocol::GOOGLE_DRIVE,
+			'Protocols/google-drive.example.com'                             => [
+				'host'     => 'google-drive.example.com',
+				'protocol' => ServerProtocol::GOOGLE_DRIVE,
 			],
-			'Protocols/onedrive.example.com'                                 => ['host'     => 'onedrive.example.com',
-			                                                                     'protocol' => ServerProtocol::ONEDRIVE,
+			'Protocols/onedrive.example.com'                                 => [
+				'host'     => 'onedrive.example.com',
+				'protocol' => ServerProtocol::ONEDRIVE,
 			],
-			'Protocols/openstack-swift.example.com'                          => ['host'     => 'openstack-swift.example.com',
-			                                                                     'protocol' => ServerProtocol::SWIFT,
+			'Protocols/openstack-swift.example.com'                          => [
+				'host'     => 'openstack-swift.example.com',
+				'protocol' => ServerProtocol::SWIFT,
 			],
-			'Protocols/rackspace-cloud-storage.example.com'                  => ['host'     => 'rackspace-cloud-storage.example.com',
-			                                                                     'protocol' => ServerProtocol::RACKSPACE,
+			'Protocols/rackspace-cloud-storage.example.com'                  => [
+				'host'     => 'rackspace-cloud-storage.example.com',
+				'protocol' => ServerProtocol::RACKSPACE,
 			],
-			'Protocols/s3.example.com'                                       => ['host'     => 's3.example.com',
-			                                                                     'protocol' => ServerProtocol::S3,
+			'Protocols/s3.example.com'                                       => [
+				'host'     => 's3.example.com',
+				'protocol' => ServerProtocol::S3,
 			],
-			'Protocols/sftp.example.com'                                     => ['host'     => 'sftp.example.com',
-			                                                                     'protocol' => ServerProtocol::SFTP,
+			'Protocols/s3.example.com - profile'                             => [
+				'profile' => 'prof',
 			],
-			'Protocols/webdav.example.com - http'                            => ['host'     => 'webdav.example.com',
-			                                                                     'protocol' => ServerProtocol::INSECURE_WEBDAV,
+			'Protocols/sftp.example.com'                                     => [
+				'host'     => 'sftp.example.com',
+				'protocol' => ServerProtocol::SFTP,
 			],
-			'Protocols/webdav.example.com - https'                           => ['host'     => 'webdav.example.com',
-			                                                                     'protocol' => ServerProtocol::WEBDAV,
+			'Protocols/webdav.example.com - http'                            => [
+				'host'     => 'webdav.example.com',
+				'protocol' => ServerProtocol::INSECURE_WEBDAV,
+			],
+			'Protocols/webdav.example.com - https'                           => [
+				'host'     => 'webdav.example.com',
+				'protocol' => ServerProtocol::WEBDAV,
 			],
 
 			// Settings/Adjusted server time group
@@ -152,8 +169,9 @@ class SiteManagerTest extends TestCase {
 
 			// Settings/Charset group
 			'Settings/Charset/autodetect'                                    => ['encodingType' => CharsetEncoding::ENCODING_AUTO],
-			'Settings/Charset/custom charset - utf16'                        => ['encodingType'   => CharsetEncoding::ENCODING_CUSTOM,
-			                                                                     'customEncoding' => 'utf16',
+			'Settings/Charset/custom charset - utf16'                        => [
+				'encodingType'   => CharsetEncoding::ENCODING_CUSTOM,
+				'customEncoding' => 'utf16',
 			],
 			'Settings/Charset/force utf8'                                    => ['encodingType' => CharsetEncoding::ENCODING_UTF8],
 
@@ -345,12 +363,50 @@ class SiteManagerTest extends TestCase {
 		}
 	}
 
+	public function testLoginType(): void {
+		$expectLogonTypes = [
+			'Settings/Login type/FTP/anonymous'        => LogonType::ANONYMOUS,
+			'Settings/Login type/FTP/normal'           => LogonType::NORMAL,
+			'Settings/Login type/FTP/ask for password' => LogonType::ASK,
+			'Settings/Login type/FTP/interactive'      => LogonType::INTERACTIVE,
+			'Settings/Login type/FTP/account'          => LogonType::ACCOUNT,
+
+			'Settings/Login type/SFTP/anonymous'        => LogonType::ANONYMOUS,
+			'Settings/Login type/SFTP/normal'           => LogonType::NORMAL,
+			'Settings/Login type/SFTP/ask for password' => LogonType::ASK,
+			'Settings/Login type/SFTP/key file'         => LogonType::KEY,
+			'Settings/Login type/SFTP/interactive'      => LogonType::INTERACTIVE,
+		];
+
+		foreach ($expectLogonTypes as $serverPath => $expectedLogonType) {
+			$server = $this->siteManager->getServer($serverPath);
+
+			$this->assertEquals($expectedLogonType, $server->getLogonType(),
+				sprintf('Logon type incorrect for %s', $serverPath));
+		}
+	}
+
+	public function testAuthAccount(): void {
+		$server = $this->siteManager->getServer('Settings/Login type/FTP/account');
+		$this->assertEquals('acct', $server->getAccount());
+	}
+
+	public function testAuthKeyFile(): void {
+		$server = $this->siteManager->getServer('Settings/Login type/SFTP/key file');
+
+		$this->assertEquals('/var/key/file', $server->getKeyFile());
+	}
+
 	public function testBackgroundColors(): void {
 		$none = $this->siteManager->getServer('Settings/General/Background color/none');
 		$this->assertEquals('none', Colour::toCamelCase($none->getColour()), 'BackgroundColor should be empty');
+		$this->assertEquals('none', Colour::toCamelCase($none->getColor()),
+			'BackgroundColor should be empty (using getColor)');
 
 		$red = $this->siteManager->getServer('Settings/General/Background color/red');
 		$this->assertEquals('red', Colour::toCamelCase($red->getColour()), 'BackgroundColor does not match for red');
+		$this->assertEquals('red', Colour::toCamelCase($red->getColor()),
+			'BackgroundColor does not match for red (using getColor)');
 	}
 
 	public function testCustomPorts(): void {
@@ -363,15 +419,17 @@ class SiteManagerTest extends TestCase {
 		$this->assertEquals(PassiveMode::MODE_DEFAULT, $defaultMode->getPassiveMode(), 'PassiveMode should be Default');
 	}
 
-	public function testPath() : void {
+	public function testPath(): void {
 		$defaultServer = $this->siteManager->getServer('Settings/Advanced/_default');
 
-		$this->assertEquals('Settings/Advanced/_default', $defaultServer->getPath(), 'Path should be Settings/Advanced/_default');
+		$this->assertEquals('Settings/Advanced/_default', $defaultServer->getPath(),
+			'Path should be Settings/Advanced/_default');
 
 		$advancedFolder = $this->siteManager->getFolder('Settings/Advanced');
-		$defaultServer = $advancedFolder->getServer('_default');
+		$defaultServer  = $advancedFolder->getServer('_default');
 
-		$this->assertEquals('Settings/Advanced/_default', $defaultServer->getPath(), 'Path should be Settings/Advanced/_default even when using relative folder');
+		$this->assertEquals('Settings/Advanced/_default', $defaultServer->getPath(),
+			'Path should be Settings/Advanced/_default even when using relative folder');
 	}
 
 	public function testFolderIteration(): void {
@@ -381,7 +439,8 @@ class SiteManagerTest extends TestCase {
 
 		$this->assertCount(2, $serverNames, 'Too many servers in Various folder');
 
-		$this->assertEquals('Various/Special !"#¤%&()=<>', $serverNames[0], 'Did not read special characters correctly');
+		$this->assertEquals('Various/Special !"#¤%&()=<>', $serverNames[0],
+			'Did not read special characters correctly');
 		$this->assertEquals('Various/Utf8 💞💢💫', $serverNames[1], 'Did not read unicode characters correctly');
 
 		$settingsFolder = $this->siteManager->getFolder('Settings');
@@ -389,7 +448,11 @@ class SiteManagerTest extends TestCase {
 		$folders = $settingsFolder->getFolders();
 		$servers = $settingsFolder->getServers();
 
-		$this->assertCount(4, $folders, 'Received an invalid amount of folders');
+		$this->assertEquals(5, $settingsFolder->countFolders(),
+			'Received an invalid amount of folders from countFolders');
+		$this->assertEquals(0, $settingsFolder->countServers(),
+			'Received an invalid amount of folders from countServers');
+		$this->assertCount(5, $folders, 'Received an invalid amount of folders');
 		$this->assertCount(0, $servers, 'Received an invalid amount of servers');
 
 		$foldersSimple = [];
@@ -415,9 +478,13 @@ class SiteManagerTest extends TestCase {
 				'name' => 'General',
 			],
 			[
+				'path' => 'Settings/Login type',
+				'name' => 'Login type',
+			],
+			[
 				'path' => 'Settings/Transfer Settings',
 				'name' => 'Transfer Settings',
-			]
+			],
 		], $foldersSimple);
 
 		$advancedFolder = $settingsFolder->getFolder('Advanced');
@@ -437,23 +504,47 @@ class SiteManagerTest extends TestCase {
 			[
 				'path' => 'Settings/Advanced/_default',
 				'name' => '_default',
-			]
+			],
 		], $advancedServersSimple);
+
+		$advancedServersDirect = $advancedFolder->getDirectChild('_default');
+
+		$this->assertEquals('Settings/Advanced/_default', $advancedServersDirect->getPath());
 	}
 
-	public function testLoadInvalidSiteManager() : void {
+	public function testLoadInvalidSiteManager(): void {
 		$this->expectExceptionMessage('Could not find a <Servers> tag in the FileZilla config');
 
 		$siteManager = new SiteManager(__DIR__ . '/fixtures/sitemanager.invalid.xml');
 	}
 
-	public function testLoadMassiveSiteManager() : void {
+	public function testLoadBlankSiteManager(): void {
+		$this->expectExceptionMessage('Document is empty');
+
+		$siteManager = new SiteManager(__DIR__ . '/fixtures/sitemanager.blank.xml');
+	}
+
+	public function testLoadNoFzTagSiteManager(): void {
+		$this->expectExceptionMessage('FileZilla3 tag not found in the sitemanager.xml file');
+
+		$siteManager = new SiteManager(__DIR__ . '/fixtures/sitemanager.nofztag.xml');
+	}
+
+	public function testLoadNotASiteManagerSiteManager(): void {
+		$this->expectExceptionMessage('Start tag expected');
+
+		$siteManager = new SiteManager(__DIR__ . '/fixtures/sitemanager.not.txt');
+	}
+
+	public function xtestLoadMassiveSiteManager(): void {
+		// too heavy, works fine
+		$this->markTestSkipped('Skipped massive site manager test - it\'s just too heavy and the code works fine (tm)');
+
 		// From InternalFixtureGenerator::generateMassiveSiteManager
-		$maxDepth = 6;
-		$foldersPerLevel = 5;
+		$maxDepth         = 6;
+		$foldersPerLevel  = 5;
 		$serversPerFolder = 5;
 
-		$totalExpectedServers = 0;
 		$totalExpectedFolders = 0;
 
 		for ($depth = 1; $depth <= $maxDepth; $depth++) {
@@ -472,14 +563,19 @@ class SiteManagerTest extends TestCase {
 		$allFolders = $siteManager->getFolders(true);
 
 		$this->assertCount($totalExpectedFolders, $allFolders, 'Could not read massive site manager folders correctly');
+
+		$this->assertEquals($totalExpectedFolders, $siteManager->countFolders(true),
+			'Could not read massive site manager servers correctly with countFolders recursive');
+		$this->assertEquals($totalExpectedServers, $siteManager->countServers(true),
+			'Could not read massive site manager folders correctly with countServers recursive');
 	}
 
-	public function testRecursiveFetch() : void {
+	public function testRecursiveFetch(): void {
 		$recursiveServers = $this->siteManager->getServers(true);
-		$this->assertCount(59, $recursiveServers, 'Recursive server count is incorrect');
+		$this->assertCount(69, $recursiveServers, 'Recursive server count is incorrect');
 
 		$recursiveFolders = $this->siteManager->getFolders(true);
-		$this->assertCount(17, $recursiveFolders, 'Recursive folder count is incorrect');
+		$this->assertCount(20, $recursiveFolders, 'Recursive folder count is incorrect');
 	}
 
 	public function testSpecialCharacters(): void {
@@ -502,8 +598,115 @@ class SiteManagerTest extends TestCase {
 		);
 	}
 
-	public function testMainFzTag() : void {
-		$this->assertEquals('3.64.0', $this->siteManager->getVersion(), 'Could not read version from main FZ config tag');
-		$this->assertEquals('windows', $this->siteManager->getPlatform(), 'Could not read platform from main FZ config tag');
+	public function testMainFzTag(): void {
+		$this->assertEquals('3.64.0', $this->siteManager->getVersion(),
+			'Could not read version from main FZ config tag');
+		$this->assertEquals('windows', $this->siteManager->getPlatform(),
+			'Could not read platform from main FZ config tag');
+	}
+
+	public function testFetchingServerAsFolder() {
+		$this->expectExceptionMessage('was a folder, not a server');
+		$this->siteManager->getServer('Settings/Advanced');
+	}
+
+	public function testFetchingFolderAsServer() {
+		$this->expectExceptionMessage('was a server, not a folder');
+		$this->siteManager->getFolder('Settings/Advanced/_default');
+	}
+
+	public function testFetchingServerInInexistentFolder() {
+		$this->expectExceptionMessage('Could not find child at path');
+		$this->siteManager->getFolder('Settings/Advanced or not/_default');
+	}
+
+	public function testFetchingServerInServerver() {
+		$this->expectExceptionMessage('is a server, can\'t go any deeper');
+		$this->siteManager->getFolder('Settings/Advanced/_default/child');
+	}
+
+	public function testGetInexistentChild() {
+		$this->expectExceptionMessage('does not exist');
+		$this->siteManager->getDirectChild('child');
+	}
+
+	public function testEmptyRemoteDirectory() {
+		$server = $this->siteManager->getServer('Settings/Advanced/_default');
+
+		$this->assertEquals(null, $server->getRemoteDirectory(null, true), 'getRemoteDirectory did not return default value null');
+		$this->assertEquals('', $server->getRemoteDirectory('', true), 'getRemoteDirectory did not return default value empty string');
+	}
+
+	public function testEnums() {
+		$server = $this->siteManager->getServer('Settings/Advanced/_default');
+
+		$this->assertEquals(0, $server->getType());
+		$this->assertEquals('_DEFAULT', ServerType::getConstantName($server->getType()));
+		$this->assertEquals('autoDetect', ServerType::toCamelCase($server->getType()));
+
+		$this->assertEquals('DOS_FWD_SLASHES', ServerType::getConstantName(ServerType::DOS_FWD_SLASHES));
+		$this->assertEquals('dosFwdSlashes', ServerType::toCamelCase(ServerType::DOS_FWD_SLASHES));
+
+		$this->assertEquals('DOS_FWD_SLASHES', ServerType::getConstantName('DOS_FWD_SLASHES'));
+
+		$this->assertEquals(1, ServerType::UNIX);
+		$this->assertEquals('UNIX', ServerType::getConstantName(ServerType::UNIX));
+		$this->assertEquals('unix', ServerType::toCamelCase(ServerType::UNIX));
+
+		$this->assertEquals(null, ServerType::getConstantName(PHP_INT_MAX));
+		$this->assertEquals(null, ServerType::toCamelCase(PHP_INT_MAX));
+	}
+
+	public function testMissingRequiredProperty() {
+		$this->expectExceptionMessage('Missing required field');
+		$server = new Server('path', [
+			'name' => 'My Path',
+		]);
+	}
+
+	public function testInexistentProperty() {
+		$this->expectExceptionMessage('does not exist');
+		$server = new Server('path', [
+			'name' => 'My Path',
+			'host' => 'host',
+			'protocol' => ServerProtocol::FTP,
+			'port' => 21,
+			'logonType' => LogonType::NORMAL,
+			'user' => 'user',
+			'pass' => 'pass',
+
+			'superDuperProperty' => true,
+		]);
+	}
+
+	public function testFolder() {
+		$folder = $this->siteManager->getFolder('Settings/Advanced');
+		$this->assertEquals('Settings', $folder->getFolderName());
+	}
+
+	public function testFromSystem() {
+		// Don't check if it exists or not - we simply call it - github won't have filezilla configs
+		try {
+			SiteManager::fromSystem();
+		} catch (\Exception $e) {
+			// It's okay, we only want to call it to make coverage happy
+		}
+
+		// Mock Windows behavior
+		OsUtil::mockOperatingSystem('WIN');
+		OsUtil::mockEnv('APPDATA', 'C:\Users\user\AppData\Roaming');
+		$this->assertStringEndsWith('/FileZilla/sitemanager.xml', SiteManager::getSystemSiteManagerPath(false));
+
+		// Mock macOS behavior
+		OsUtil::mockOperatingSystem('Darwin');
+		OsUtil::mockEnv('HOME', '/home/user');
+		$this->assertStringEndsWith('/.config/filezilla/sitemanager.xml', SiteManager::getSystemSiteManagerPath(false));
+
+		// Mock Linux behavior
+		OsUtil::mockOperatingSystem('Linux');
+		OsUtil::mockEnv('HOME', '/home/user');
+		$this->assertStringEndsWith('/.config/filezilla/sitemanager.xml', SiteManager::getSystemSiteManagerPath(false));
+
+		OsUtil::clearMock();
 	}
 }

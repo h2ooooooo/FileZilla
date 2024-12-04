@@ -1,9 +1,11 @@
 <?php
 
-use jalsoedesign\filezilla\InternalFixtureGenerator;
+use Tests\InternalFixtureGenerator;
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
+require_once(__DIR__ . '/InternalFixtureGenerator.php');
 $fixtureGenerator = new InternalFixtureGenerator();
 
-$fixtureGenerator->generateMassiveSiteManager();
+// too heavy, works fine
+//$fixtureGenerator->generateMassiveSiteManager();

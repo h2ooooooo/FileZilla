@@ -151,9 +151,9 @@ class Folder extends AbstractServerFolderChild
 	 *
 	 * @throws \Exception
 	 */
-	protected function getDirectChild(string $childName) : Server|Folder {
+	public function getDirectChild(string $childName) : Server|Folder {
 		if (!$this->hasDirectChild($childName)) {
-			throw new \Exception(sprintf('Child at path "%s/%s" does not exist.', $this->getPath() . $childName));
+			throw new \Exception(sprintf('Child at path "%s" does not exist.', $this->getChildPath($childName)));
 		}
 
 		return $this->children[$childName];
@@ -224,7 +224,7 @@ class Folder extends AbstractServerFolderChild
 	/**
 	 * @param string $folderPath
 	 *
-	 * @return Server
+	 * @return Folder
 	 * @throws \Exception
 	 */
 	public function getFolder(string $folderPath) : Folder {

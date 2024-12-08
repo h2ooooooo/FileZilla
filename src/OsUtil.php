@@ -46,7 +46,7 @@ class OsUtil {
 	 */
 	public static function getEnv(string $env) : string
 	{
-		return static::$mockedEnv[$env] ?? '';
+		return static::$mockedEnv[$env] ?? getenv($env);
 	}
 
 	/**

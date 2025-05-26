@@ -359,37 +359,39 @@ class Server extends AbstractServerFolderChild
 		 */
 		$remoteDirectory = $this->remoteDirectory;
 
-		if (preg_match('~^(\d+)\s+(\d+)\s+(.+)$~', $remoteDirectory, $match)) {
-			$pathType = (int)$match[1];
-			$prefixLength = (int)$match[2];
+		if (!empty($remoteDirectory)) {
+			if (preg_match('~^(\d+)\s+(\d+)\s+(.+)$~', $remoteDirectory, $match)) {
+				$pathType     = (int) $match[1];
+				$prefixLength = (int) $match[2];
 
-			$offset = 0;
+				$offset = 0;
 
-			$pathSegments = [];
+				$pathSegments = [];
 
-			while (preg_match('~(\d+)~', $match[3], $pathLengthMatch, PREG_OFFSET_CAPTURE, $offset)) {
-				$pathStringLength = strlen($pathLengthMatch[1][0]);
-				$pathLength = (int)$pathLengthMatch[1][0];
-				$pathLengthOffset = (int)$pathLengthMatch[1][1];
+				while (preg_match('~(\d+)~', $match[3], $pathLengthMatch, PREG_OFFSET_CAPTURE, $offset)) {
+					$pathStringLength = strlen($pathLengthMatch[1][0]);
+					$pathLength       = (int) $pathLengthMatch[1][0];
+					$pathLengthOffset = (int) $pathLengthMatch[1][1];
 
-				$pathSegments[] = substr($match[3], $pathLengthOffset + $pathStringLength + 1, $pathLength);
+					$pathSegments[] = substr($match[3], $pathLengthOffset + $pathStringLength + 1, $pathLength);
 
-				$offset = $pathLengthOffset + $pathStringLength + $pathLength + 1;
+					$offset = $pathLengthOffset + $pathStringLength + $pathLength + 1;
+				}
+
+				$directorySeparator = '/';
+
+				if ($pathType === ServerType::DOS) {
+					$directorySeparator = '\\';
+				}
+
+				$path = implode($directorySeparator, $pathSegments);
+
+				if ($pathType === ServerType::UNIX) {
+					$path = '/' . $path;
+				}
+
+				return $path;
 			}
-
-			$directorySeparator = '/';
-
-			if ($pathType === ServerType::DOS) {
-				$directorySeparator = '\\';
-			}
-
-			$path = implode($directorySeparator, $pathSegments);
-
-			if ($pathType === ServerType::UNIX) {
-				$path = '/' . $path;
-			}
-
-			return $path;
 		}
 
 		return $default;
